@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unreal Engine 5 C++ Cheatsheet</title>
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f6feb;
+    --code-bg: #0d1117;
+    --keyword: #ff7b72;
+    --type: #79c0ff;
+    --string: #a5d6ff;
+    --comment: #8b949e;
+    --func: #d2a8ff;
+    --number: #79c0ff;
+    --macro: #ffa657;
+    --ue-blue: #2563eb;
+    --ue-dark: #1e40af;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--ue-dark) 0%, #0f172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    color: var(--text-dim);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  .layout {
+    display: flex;
+    min-height: calc(100vh - 80px);
+  }
+
+  nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 1rem 0;
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+    font-size: 0.8125rem;
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-track { background: transparent; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  nav .nav-section {
+    padding: 0.5rem 1rem 0.25rem;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  nav a {
+    display: block;
+    padding: 0.2rem 1rem 0.2rem 1.5rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--text);
+    background: rgba(88,166,255,0.06);
+    border-left-color: var(--accent);
+  }
+
+  main {
+    flex: 1;
+    max-width: 960px;
+    padding: 2rem 2.5rem;
+  }
+
+  .category {
+    margin-bottom: 3rem;
+  }
+
+  .category > h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: rgba(88,166,255,0.04);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card-header:hover { background: rgba(88,166,255,0.08); }
+
+  .card-header h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .card-header .toggle {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+  }
+
+  .card.collapsed .card-header .toggle { transform: rotate(-90deg); }
+  .card.collapsed .card-body { display: none; }
+
+  .card-body { padding: 1rem; }
+
+  .card-body .note {
+    color: var(--text-dim);
+    font-size: 0.8125rem;
+    margin-bottom: 0.75rem;
+    font-style: italic;
+  }
+
+  .card-body .file-label {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--macro);
+    background: rgba(255,166,87,0.1);
+    padding: 0.125rem 0.5rem;
+    border-radius: 3px;
+    margin-bottom: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.875rem 1rem;
+    overflow-x: auto;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    margin-bottom: 0.75rem;
+  }
+
+  pre:last-child { margin-bottom: 0; }
+
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  }
+
+  .kw { color: var(--keyword); }
+  .ty { color: var(--type); }
+  .fn { color: var(--func); }
+  .st { color: var(--string); }
+  .cm { color: var(--comment); }
+  .nu { color: var(--number); }
+  .mc { color: var(--macro); }
+  .pp { color: var(--macro); }
+
+  .blueprint-img {
+    max-width: 100%;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .img-toggle {
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: none;
+    border: 1px solid var(--accent-dim);
+    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    transition: all 0.15s;
+  }
+
+  .img-toggle:hover {
+    background: rgba(88,166,255,0.1);
+  }
+
+  .img-container { display: none; }
+  .img-container.visible { display: block; }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .search-box {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+    outline: none;
+  }
+
+  .search-box input:focus { border-color: var(--accent); }
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  .back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--accent-dim);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 50;
+  }
+
+  .back-to-top.visible { opacity: 1; }
+  .back-to-top:hover { background: var(--accent); }
+
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 1.5rem 1rem; }
+    header { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Unreal Engine 5 <span>C++ Cheatsheet</span></h1>
+  <p>Blueprint nodes translated to C++ &mdash; 85 examples across 8 categories</p>
+</header>
+
+<div class="layout">
+<nav>
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Search nodes..." autocomplete="off">
+  </div>
+
+  <div class="nav-section">Basics</div>
+  <a href="#branch">Branch</a>
+  <a href="#for-loop">For Loop</a>
+  <a href="#for-loop-with-break">For Loop with Break</a>
+  <a href="#for-each-loop">For Each Loop</a>
+  <a href="#for-each-loop-with-break">For Each Loop with Break</a>
+  <a href="#while-loop">While Loop</a>
+  <a href="#flip-flop">Flip Flop</a>
+  <a href="#cast-to">Cast To</a>
+
+  <div class="nav-section">AActor</div>
+  <a href="#event-beginplay">Event BeginPlay</a>
+  <a href="#event-tick">Event Tick</a>
+  <a href="#set-actor-location">Set Actor Location</a>
+  <a href="#set-actor-rotation">Set Actor Rotation</a>
+  <a href="#set-actor-scale-3d">Set Actor Scale 3D</a>
+  <a href="#set-actor-transform">Set Actor Transform</a>
+  <a href="#set-actor-hidden-in-game">Set Actor Hidden In Game</a>
+  <a href="#destroy-actor">Destroy Actor</a>
+
+  <div class="nav-section">AGameModeBase</div>
+  <a href="#event-onpostlogin">Event OnPostLogin</a>
+  <a href="#event-onlogout">Event OnLogout</a>
+
+  <div class="nav-section">Components</div>
+  <a href="#play-animation">Play Animation</a>
+  <a href="#set-relative-location">Set Relative Location</a>
+  <a href="#set-world-location">Set World Location</a>
+  <a href="#set-relative-rotation">Set Relative Rotation</a>
+  <a href="#set-world-rotation">Set World Rotation</a>
+
+  <div class="nav-section">Math</div>
+  <a href="#min-int">Min (Int)</a>
+  <a href="#max-int">Max (Int)</a>
+  <a href="#min-float">Min (Float)</a>
+  <a href="#max-float">Max (Float)</a>
+  <a href="#ceil">Ceil</a>
+  <a href="#floor">Floor</a>
+  <a href="#absolute">Absolute</a>
+  <a href="#clamp">Clamp</a>
+  <a href="#lerp">Lerp</a>
+  <a href="#nearly-equal">Nearly Equal</a>
+  <a href="#make-vector">Make Vector</a>
+  <a href="#make-rotator">Make Rotator</a>
+  <a href="#break-vector">Break Vector</a>
+  <a href="#break-rotator">Break Rotator</a>
+  <a href="#vector-length">Vector Length</a>
+  <a href="#distance-vector">Distance (Vector)</a>
+  <a href="#normalize-vector">Normalize (Vector)</a>
+  <a href="#finterp-to">FInterp To</a>
+  <a href="#vinterp-to">VInterp To</a>
+  <a href="#rinterp-to">RInterp To</a>
+  <a href="#find-look-at-rotation">Find Look at Rotation</a>
+  <a href="#random-integer">Random Integer</a>
+  <a href="#random-float">Random Float</a>
+  <a href="#random-integer-in-range">Random Integer in Range</a>
+  <a href="#random-float-in-range">Random Float in Range</a>
+
+  <div class="nav-section">Timer</div>
+  <a href="#set-timer-by-function-name">Set Timer by Function Name</a>
+  <a href="#set-timer-by-event">Set Timer by Event</a>
+  <a href="#clear-and-invalidate-timer-by-handle">Clear/Invalidate Timer</a>
+  <a href="#clear-timer-by-function-name">Clear Timer by Func Name</a>
+  <a href="#invalidate-timer-handle">Invalidate Timer Handle</a>
+
+  <div class="nav-section">User Interface</div>
+  <a href="#create-widget">Create Widget</a>
+  <a href="#add-to-viewport">Add to Viewport</a>
+  <a href="#set-input-mode-game-only">Input Mode Game Only</a>
+  <a href="#set-input-mode-ui-only">Input Mode UI Only</a>
+  <a href="#set-input-mode-game-and-ui">Input Mode Game &amp; UI</a>
+
+  <div class="nav-section">Utilities</div>
+  <a href="#delay">Delay</a>
+  <a href="#print-string">Print String</a>
+  <a href="#get-player-controller">Get Player Controller</a>
+  <a href="#get-player-camera-manager">Get Player Camera Manager</a>
+  <a href="#spawn-emitter-at-location">Spawn Emitter at Location</a>
+  <a href="#line-trace-by-channel">Line Trace By Channel</a>
+  <a href="#multi-line-trace-by-channel">Multi Line Trace</a>
+  <a href="#get-actor-of-class">Get Actor Of Class</a>
+  <a href="#get-all-actors-of-class">Get All Actors Of Class</a>
+  <a href="#get-all-actors-with-tag">Get All Actors with Tag</a>
+  <a href="#spawn-actor-from-class">Spawn Actor from Class</a>
+  <a href="#play-sound-2d">Play Sound 2D</a>
+  <a href="#play-sound-at-location">Play Sound at Location</a>
+  <a href="#apply-damage">Apply Damage</a>
+  <a href="#apply-radial-damage">Apply Radial Damage</a>
+  <a href="#get-game-mode">Get Game Mode</a>
+  <a href="#get-game-state">Get Game State</a>
+  <a href="#project-world-to-screen">Project World to Screen</a>
+  <a href="#deproject-screen-to-world">Deproject Screen to World</a>
+  <a href="#open-level-by-name">Open Level (by Name)</a>
+  <a href="#set-game-paused">Set Game Paused</a>
+  <a href="#spawn-decal-at-location">Spawn Decal at Location</a>
+  <a href="#draw-debug-line">Draw Debug Line</a>
+  <a href="#draw-debug-box">Draw Debug Box</a>
+  <a href="#is-valid">Is Valid</a>
+  <a href="#quit-game">Quit Game</a>
+</nav>
+
+<main>
+
+<!-- ==================== BASICS ==================== -->
+<section class="category" id="cat-basics">
+<h2>Basics</h2>
+
+<div class="card" id="branch">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Branch</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/e687fde3-e7b6-4136-97d8-eb79f2dcf740" alt="branch" loading="lazy"></div>
+<pre><code><span class="kw">bool</span> ExampleCondition;
+
+<span class="kw">if</span> (ExampleCondition)
+{
+    <span class="cm">// True...</span>
+}
+<span class="kw">else</span>
+{
+    <span class="cm">// False...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="for-loop">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>For Loop</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8b084c5c-9114-4666-a0bd-3cad1ce2e35e" alt="for_loop" loading="lazy"></div>
+<pre><code><span class="kw">for</span> (<span class="ty">int32</span> i = <span class="nu">0</span>; i &lt;= <span class="nu">10</span>; i++)
+{
+    <span class="cm">// Loop Body...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="for-loop-with-break">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>For Loop with Break</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/734dbab8-19ea-41a6-822d-02465742d47b" alt="for_loop_break" loading="lazy"></div>
+<pre><code><span class="kw">bool</span> ExampleBreakCondition;
+
+<span class="kw">for</span> (<span class="ty">int32</span> i = <span class="nu">0</span>; i &lt;= <span class="nu">10</span>; i++)
+{
+    <span class="kw">if</span> (ExampleBreakCondition) { <span class="kw">break</span>; }
+    <span class="cm">// Loop Body...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="for-each-loop">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>For Each Loop</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/4c7d8868-2ca5-4858-a745-47e3286359ad" alt="for_each_loop" loading="lazy"></div>
+<pre><code><span class="ty">TArray</span>&lt;<span class="ty">int32</span>&gt; ExampleArray;
+
+<span class="kw">for</span> (<span class="ty">int32</span> Element : ExampleArray)
+{
+    <span class="cm">// Loop Body...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="for-each-loop-with-break">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>For Each Loop with Break</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/bd61fbb2-9c02-45a1-9d59-cf9190d42f52" alt="for_each_loop_break" loading="lazy"></div>
+<pre><code><span class="ty">TArray</span>&lt;<span class="ty">int32</span>&gt; ExampleArray;
+
+<span class="kw">bool</span> ExampleBreakCondition;
+
+<span class="kw">for</span> (<span class="ty">int32</span> Element : ExampleArray)
+{
+    <span class="kw">if</span> (ExampleBreakCondition) { <span class="kw">break</span>; }
+    <span class="cm">// Loop Body...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="while-loop">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>While Loop</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8d72bfc5-9f90-4e65-a257-870fb5b2ddb7" alt="while_loop" loading="lazy"></div>
+<pre><code><span class="kw">bool</span> ExampleCondition;
+
+<span class="kw">while</span> (ExampleCondition)
+{
+    <span class="cm">// Loop Body...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="flip-flop">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Flip Flop</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/75e2e317-f4b0-4cd5-a333-5dc444c859c6" alt="flip_flop" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="kw">bool</span> IsA = <span class="kw">true</span>;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="kw">if</span> (IsA)
+{
+    <span class="cm">// A...</span>
+}
+<span class="kw">else</span>
+{
+    <span class="cm">// B...</span>
+}
+IsA = !IsA;</code></pre>
+  </div>
+</div>
+
+<div class="card" id="cast-to">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Cast To</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/5ea906b6-8c8a-4cf6-a84d-a32877da5bca" alt="cast_to" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="cm">// Casting: &lt;&gt; = Type to cast to, () = Object to cast</span>
+<span class="ty">ACharacter</span>* ExampleCharacter = <span class="fn">Cast</span>&lt;<span class="ty">ACharacter</span>&gt;(ExampleActor);
+
+<span class="kw">if</span> (ExampleCharacter)
+{
+    <span class="cm">// Cast Succeeded...</span>
+}
+<span class="kw">else</span>
+{
+    <span class="cm">// Cast Failed...</span>
+}</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== AACTOR ==================== -->
+<section class="category" id="cat-aactor">
+<h2>AActor</h2>
+
+<div class="card" id="event-beginplay">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Event BeginPlay</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/448e4095-4385-4fa6-b095-3890eb46a7b4" alt="event_beginplay" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">protected</span>:
+    <span class="kw">virtual</span> <span class="kw">void</span> <span class="fn">BeginPlay</span>() <span class="kw">override</span>;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="kw">void</span> <span class="ty">AExampleActor</span>::<span class="fn">BeginPlay</span>()
+{
+    <span class="ty">Super</span>::<span class="fn">BeginPlay</span>();
+
+    <span class="cm">// Your code here...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="event-tick">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Event Tick</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ed6844ae-92c0-47c8-af89-f18625c6d287" alt="event_tick" loading="lazy"></div>
+    <p class="note">Make sure PrimaryActorTick.bCanEverTick is set to true in the constructor.</p>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">public</span>:
+    <span class="kw">virtual</span> <span class="kw">void</span> <span class="fn">Tick</span>(<span class="kw">float</span> DeltaTime) <span class="kw">override</span>;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="kw">void</span> <span class="ty">AExampleActor</span>::<span class="fn">Tick</span>(<span class="kw">float</span> DeltaTime)
+{
+    <span class="ty">Super</span>::<span class="fn">Tick</span>(DeltaTime);
+
+    <span class="cm">// Your code here...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-actor-location">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Actor Location</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/2148dae7-d628-44c5-bf2b-73f41dab5281" alt="set_actor_location" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="ty">FVector</span> NewLocation;
+
+ExampleActor-&gt;<span class="fn">SetActorLocation</span>(NewLocation);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-actor-rotation">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Actor Rotation</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/335ced1e-4edd-4a52-9ec4-f06d9d971189" alt="set_actor_rotation" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="ty">FRotator</span> NewRotation;
+
+<span class="cm">// Convert FRotator to FQuat and set actor rotation</span>
+ExampleActor-&gt;<span class="fn">SetActorRotation</span>(<span class="ty">FQuat</span>::<span class="fn">MakeFromRotator</span>(NewRotation));</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-actor-scale-3d">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Actor Scale 3D</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/39b2bc03-5b67-4fe2-9e37-4c2dfef77de4" alt="set_actor_scale_3d" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="ty">FVector</span> NewScale3D;
+
+ExampleActor-&gt;<span class="fn">SetActorScale3D</span>(NewScale3D);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-actor-transform">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Actor Transform</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/81a18215-7487-4db9-bcfe-1cb7bca55dfc" alt="set_actor_transform" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="ty">FVector</span> NewLocation;
+<span class="ty">FRotator</span> NewRotation;
+<span class="ty">FVector</span> NewScale3D;
+
+<span class="cm">// Create FTransform (rotation, location and scale)</span>
+<span class="ty">FTransform</span> NewTransform(NewRotation, NewLocation, NewScale3D);
+
+ExampleActor-&gt;<span class="fn">SetActorTransform</span>(NewTransform);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-actor-hidden-in-game">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Actor Hidden In Game</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/f1c25431-9226-4749-8c34-8db4bf811431" alt="set_actor_hidden_in_game" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="kw">bool</span> bHideActor;
+
+ExampleActor-&gt;<span class="fn">SetActorHiddenInGame</span>(bHideActor);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="destroy-actor">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Destroy Actor</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/361abba1-842e-42a0-a7f3-1857b1395c7f" alt="destroy_actor" loading="lazy"></div>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+ExampleActor-&gt;<span class="fn">Destroy</span>();</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== AGAMEMODEBASE ==================== -->
+<section class="category" id="cat-agamemodebase">
+<h2>AGameModeBase</h2>
+
+<div class="card" id="event-onpostlogin">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Event OnPostLogin</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/4462ae77-4c8a-46ef-bf2d-10e42bd0d960" alt="event_login" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">public</span>:
+    <span class="kw">virtual</span> <span class="kw">void</span> <span class="fn">PostLogin</span>(<span class="ty">APlayerController</span>* NewPlayer) <span class="kw">override</span>;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="kw">void</span> <span class="ty">ExampleGameMode</span>::<span class="fn">PostLogin</span>(<span class="ty">APlayerController</span>* NewPlayer)
+{
+    <span class="ty">Super</span>::<span class="fn">PostLogin</span>(NewPlayer);
+
+    <span class="cm">// Your code here...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="event-onlogout">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Event OnLogout</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/9d22ba61-ce4b-425a-8ccd-d07075c84b76" alt="event_logout" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">public</span>:
+    <span class="kw">virtual</span> <span class="kw">void</span> <span class="fn">Logout</span>(<span class="ty">AController</span>* Exiting) <span class="kw">override</span>;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="kw">void</span> <span class="ty">ExampleGameMode</span>::<span class="fn">Logout</span>(<span class="ty">AController</span>* Exiting)
+{
+    <span class="cm">// Your code here...</span>
+}</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== COMPONENTS ==================== -->
+<section class="category" id="cat-components">
+<h2>Components</h2>
+
+<div class="card" id="play-animation">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Play Animation</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/597e01a3-dcd5-4a5a-ba41-a6fb13392a85" alt="play_animation" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="kw">class</span> <span class="ty">UAnimationAsset</span>* ExampleAnimation;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="ty">USkeletalMeshComponent</span>* ExampleComponent;
+
+<span class="kw">if</span> (ExampleAnimation)
+{
+    ExampleComponent-&gt;<span class="fn">PlayAnimation</span>(
+        ExampleAnimation,         <span class="cm">// Animation asset</span>
+        <span class="kw">false</span>                     <span class="cm">// Loop animation?</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-relative-location">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Relative Location</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8f4902d0-0681-49cc-989e-2ab1c6355652" alt="set_relative_location" loading="lazy"></div>
+<pre><code><span class="ty">USkeletalMeshComponent</span>* ExampleComponent;
+
+<span class="ty">FVector</span> NewLocation;
+
+ExampleComponent-&gt;<span class="fn">SetRelativeLocation</span>(NewLocation);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-world-location">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set World Location</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/5302daff-501e-41b6-89b3-e677e79a948e" alt="set_world_location" loading="lazy"></div>
+<pre><code><span class="ty">USkeletalMeshComponent</span>* ExampleComponent;
+
+<span class="ty">FVector</span> NewLocation;
+
+ExampleComponent-&gt;<span class="fn">SetWorldLocation</span>(NewLocation);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-relative-rotation">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Relative Rotation</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/43178a81-d20a-4ab4-b9fd-43319df693c8" alt="set_relative_rotation" loading="lazy"></div>
+<pre><code><span class="ty">USkeletalMeshComponent</span>* ExampleComponent;
+
+<span class="ty">FRotator</span> NewRotation;
+
+<span class="cm">// Convert FRotator to FQuat and set relative rotation</span>
+ExampleComponent-&gt;<span class="fn">SetRelativeRotation</span>(<span class="ty">FQuat</span>::<span class="fn">MakeFromRotator</span>(NewRotation));</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-world-rotation">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set World Rotation</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/c98603a9-e6ae-4027-a729-1f98a6e15b50" alt="set_world_rotation" loading="lazy"></div>
+<pre><code><span class="ty">USkeletalMeshComponent</span>* ExampleComponent;
+
+<span class="ty">FRotator</span> NewRotation;
+
+<span class="cm">// Convert FRotator to FQuat and set world rotation</span>
+ExampleComponent-&gt;<span class="fn">SetWorldRotation</span>(<span class="ty">FQuat</span>::<span class="fn">MakeFromRotator</span>(NewRotation));</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== MATH ==================== -->
+<section class="category" id="cat-math">
+<h2>Math</h2>
+
+<div class="card" id="min-int">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Min (Int)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/77000cec-1fab-4c82-abee-a187d6b36253" alt="min_int" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="ty">int32</span> A;
+<span class="ty">int32</span> B;
+
+<span class="ty">int32</span> Min = <span class="ty">UKismetMathLibrary</span>::<span class="fn">Min</span>(A, B);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="max-int">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Max (Int)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/c4200223-e54c-4938-ad44-7e624696b8a2" alt="max_int" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="ty">int32</span> A;
+<span class="ty">int32</span> B;
+
+<span class="ty">int32</span> Max = <span class="ty">UKismetMathLibrary</span>::<span class="fn">Max</span>(A, B);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="min-float">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Min (Float)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ce9c8d03-f353-4ed9-a0b2-47ec9bce0e22" alt="min_float" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="kw">float</span> A;
+<span class="kw">float</span> B;
+
+<span class="kw">float</span> Min = <span class="ty">UKismetMathLibrary</span>::<span class="fn">FMin</span>(A, B);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="max-float">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Max (Float)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/dffbd570-d90b-4687-8737-f55a5a853f90" alt="max_float" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="kw">float</span> A;
+<span class="kw">float</span> B;
+
+<span class="kw">float</span> Max = <span class="ty">UKismetMathLibrary</span>::<span class="fn">FMax</span>(A, B);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="ceil">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Ceil</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ff0ab4a3-442c-4524-bd8e-bebc54519e9f" alt="ceil" loading="lazy"></div>
+<pre><code><span class="kw">float</span> A;
+
+<span class="ty">int32</span> Result = <span class="ty">FMath</span>::<span class="fn">CeilToInt</span>(A);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="floor">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Floor</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8ac11bbf-e7cd-410f-bb50-7944a4dfbfaf" alt="floor" loading="lazy"></div>
+<pre><code><span class="kw">float</span> A;
+
+<span class="ty">int32</span> Result = <span class="ty">FMath</span>::<span class="fn">FloorToInt</span>(A);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="absolute">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Absolute</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ffc253c0-d05b-42a1-9317-b182a4194395" alt="absolute" loading="lazy"></div>
+<pre><code><span class="ty">int32</span> A;
+<span class="ty">int32</span> Result1 = <span class="ty">FMath</span>::<span class="fn">Abs</span>(A);
+
+<span class="kw">float</span> B;
+<span class="kw">float</span> Result2 = <span class="ty">FMath</span>::<span class="fn">Abs</span>(B);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="clamp">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Clamp</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/5d84b870-7289-4b4f-917c-c29d323eee59" alt="clamp" loading="lazy"></div>
+<pre><code><span class="kw">float</span> A;
+<span class="kw">float</span> Min;
+<span class="kw">float</span> Max;
+
+<span class="kw">float</span> Result = <span class="ty">FMath</span>::<span class="fn">Clamp</span>(A, Min, Max);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="lerp">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Lerp</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/b7587e23-8e60-40db-85d3-87897c0af860" alt="lerp" loading="lazy"></div>
+<pre><code><span class="kw">float</span> A;
+<span class="kw">float</span> B;
+<span class="kw">float</span> Alpha;
+
+<span class="kw">float</span> Result = <span class="ty">FMath</span>::<span class="fn">Lerp</span>(A, B, Alpha);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="nearly-equal">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Nearly Equal</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/a23b17ae-e2b3-41e9-8c97-f960a36f65b6" alt="nearly_equal" loading="lazy"></div>
+<pre><code><span class="kw">float</span> A;
+<span class="kw">float</span> B;
+<span class="kw">float</span> ErrorTolerance;
+
+<span class="kw">bool</span> Result = <span class="ty">FMath</span>::<span class="fn">IsNearlyEqual</span>(A, B, ErrorTolerance);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="make-vector">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Make Vector</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/3345d020-a2a3-498d-a675-edd13a57fb55" alt="make_vector" loading="lazy"></div>
+<pre><code><span class="kw">float</span> X;
+<span class="kw">float</span> Y;
+<span class="kw">float</span> Z;
+
+<span class="ty">FVector</span> ExampleVector(X, Y, Z);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="make-rotator">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Make Rotator</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/0e941912-f82f-4dd0-befb-7e19140ae6b2" alt="make_rotator" loading="lazy"></div>
+<pre><code><span class="kw">float</span> Pitch;
+<span class="kw">float</span> Yaw;
+<span class="kw">float</span> Roll;
+
+<span class="ty">FRotator</span> ExampleRotator(Pitch, Yaw, Roll);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="break-vector">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Break Vector</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/b505cc33-9bd6-4970-89b8-5fcf1d7825f7" alt="break_vector" loading="lazy"></div>
+    <p class="note">Access each component of an FVector using .X, .Y and .Z.</p>
+<pre><code><span class="ty">FVector</span> ExampleVector;
+
+ExampleVector.X;     <span class="cm">// X</span>
+ExampleVector.Y;     <span class="cm">// Y</span>
+ExampleVector.Z;     <span class="cm">// Z</span></code></pre>
+  </div>
+</div>
+
+<div class="card" id="break-rotator">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Break Rotator</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ea188d19-643c-41de-9744-b949bb1492f9" alt="break_rotator" loading="lazy"></div>
+    <p class="note">Access each component of an FRotator using .Pitch, .Yaw and .Roll.</p>
+<pre><code><span class="ty">FRotator</span> ExampleRotator;
+
+ExampleRotator.Pitch;    <span class="cm">// Pitch</span>
+ExampleRotator.Yaw;      <span class="cm">// Yaw</span>
+ExampleRotator.Roll;     <span class="cm">// Roll</span></code></pre>
+  </div>
+</div>
+
+<div class="card" id="vector-length">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Vector Length</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/6f2423f1-01ae-4691-ab5d-8d76d3895e09" alt="vector_length" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> ExampleVector;
+
+ExampleVector.<span class="fn">Size</span>();</code></pre>
+  </div>
+</div>
+
+<div class="card" id="distance-vector">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Distance (Vector)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/3fe385ac-6a67-4ca8-970e-2fd532d58eb9" alt="distance_vector" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> A;
+<span class="ty">FVector</span> B;
+
+<span class="ty">FVector</span>::<span class="fn">Distance</span>(A, B);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="normalize-vector">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Normalize (Vector)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/cd181aa9-ec20-48de-946f-10ed5baaae44" alt="normalize_vector" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> ExampleVector;
+
+<span class="kw">float</span> Tolerance;
+
+<span class="cm">// Normalizes the vector in-place</span>
+ExampleVector.<span class="fn">Normalize</span>(Tolerance);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="finterp-to">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>FInterp To</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8a0d579d-a306-4ee1-a7f7-2f64f39188d7" alt="finterp_to" loading="lazy"></div>
+<pre><code><span class="kw">float</span> Current;
+<span class="kw">float</span> Target;
+<span class="kw">float</span> DeltaTime;
+<span class="kw">float</span> InterpSpeed;
+
+<span class="kw">float</span> Result = <span class="ty">FMath</span>::<span class="fn">FInterpTo</span>(Current, Target, DeltaTime, InterpSpeed);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="vinterp-to">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>VInterp To</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/d68d7223-cc12-4815-a6f6-d20b4f92349b" alt="vinterp_to" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> Current;
+<span class="ty">FVector</span> Target;
+<span class="kw">float</span> DeltaTime;
+<span class="kw">float</span> InterpSpeed;
+
+<span class="ty">FVector</span> Result = <span class="ty">FMath</span>::<span class="fn">VInterpTo</span>(Current, Target, DeltaTime, InterpSpeed);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="rinterp-to">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>RInterp To</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/f0cf22a5-5e89-44e9-89fe-701c28519973" alt="rinterp_to" loading="lazy"></div>
+<pre><code><span class="ty">FRotator</span> Current;
+<span class="ty">FRotator</span> Target;
+<span class="kw">float</span> DeltaTime;
+<span class="kw">float</span> InterpSpeed;
+
+<span class="ty">FRotator</span> Result = <span class="ty">FMath</span>::<span class="fn">RInterpTo</span>(Current, Target, DeltaTime, InterpSpeed);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="find-look-at-rotation">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Find Look at Rotation</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ac23361d-6a4e-4101-af11-49e52e5351e2" alt="find_look_at_rotation" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="ty">FVector</span> Start;
+<span class="ty">FVector</span> Target;
+
+<span class="ty">FRotator</span> Result = <span class="ty">UKismetMathLibrary</span>::<span class="fn">FindLookAtRotation</span>(Start, Target);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="random-integer">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Random Integer</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/9b971e6e-df44-4530-9465-bb9e5c4f5052" alt="random_integer" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="ty">int32</span> Max;
+
+<span class="ty">int32</span> Result = <span class="ty">UKismetMathLibrary</span>::<span class="fn">RandomInteger</span>(Max);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="random-float">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Random Float</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/35a19fd8-9848-4768-9c41-9f4cfd7c11f5" alt="random_float" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="kw">float</span> Result = <span class="ty">UKismetMathLibrary</span>::<span class="fn">RandomFloat</span>();</code></pre>
+  </div>
+</div>
+
+<div class="card" id="random-integer-in-range">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Random Integer in Range</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/967e7c9e-20ad-44de-974b-2af45843826e" alt="random_integer_in_range" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="ty">int32</span> Min;
+<span class="ty">int32</span> Max;
+
+<span class="ty">int32</span> Result = <span class="ty">UKismetMathLibrary</span>::<span class="fn">RandomIntegerInRange</span>(Min, Max);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="random-float-in-range">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Random Float in Range</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/804bb5c9-d723-4de7-8f02-60bb31fb3614" alt="random_float_in_range" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/KismetMathLibrary.h"</span>
+
+<span class="kw">float</span> Min;
+<span class="kw">float</span> Max;
+
+<span class="kw">float</span> Result = <span class="ty">UKismetMathLibrary</span>::<span class="fn">RandomFloatInRange</span>(Min, Max);</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== TIMER ==================== -->
+<section class="category" id="cat-timer">
+<h2>Timer</h2>
+
+<div class="card" id="set-timer-by-function-name">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Timer by Function Name</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/62ef21a4-13a2-4548-852c-2db016122496" alt="set_timer_by_function_name" loading="lazy"></div>
+<pre><code><span class="pp">#include "TimerManager.h"</span>
+
+<span class="ty">FTimerHandle</span> TimerHandle;
+
+<span class="fn">GetWorldTimerManager</span>().<span class="fn">SetTimer</span>(
+    TimerHandle,                          <span class="cm">// Timer handle</span>
+    <span class="kw">this</span>,                                 <span class="cm">// Object to call on</span>
+    &amp;<span class="ty">AExampleCharacter</span>::ExampleMethod,    <span class="cm">// Method to call</span>
+    <span class="nu">3.0f</span>,                                 <span class="cm">// Delay (seconds)</span>
+    <span class="kw">false</span>                                 <span class="cm">// Loop timer?</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-timer-by-event">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Timer by Event</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/61cac459-b4fa-4d0b-a44d-ecff6b1c9cbc" alt="set_timer_by_event" loading="lazy"></div>
+    <p class="note">There is no equivalent to events in C++, so you set timers by function name instead. See: Set Timer by Function Name</p>
+  </div>
+</div>
+
+<div class="card" id="clear-and-invalidate-timer-by-handle">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Clear and Invalidate Timer by Handle</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/46aa7911-c1a9-4a26-b35a-d86ffe9701a3" alt="clear_and_invalidate_timer_by_handle" loading="lazy"></div>
+<pre><code><span class="pp">#include "TimerManager.h"</span>
+
+<span class="ty">FTimerHandle</span> ExampleTimerHandle;
+
+<span class="cm">// Clear and invalidate timer handle</span>
+<span class="fn">GetWorldTimerManager</span>().<span class="fn">ClearTimer</span>(ExampleTimerHandle);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="clear-timer-by-function-name">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Clear Timer by Function Name</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/59f234a8-f398-4d58-abf4-618311330eb9" alt="clear_timer_by_function_name" loading="lazy"></div>
+    <p class="note">There is no equivalent to this node in C++, so you clear timers by handle instead. See: Clear and Invalidate Timer by Handle</p>
+  </div>
+</div>
+
+<div class="card" id="invalidate-timer-handle">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Invalidate Timer Handle</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/0ee4ba44-3f51-4292-be29-1c4e50c03910" alt="invalidate_timer_handle" loading="lazy"></div>
+<pre><code><span class="ty">FTimerHandle</span> ExampleTimerHandle;
+
+ExampleTimerHandle.<span class="fn">Invalidate</span>();</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== USER INTERFACE ==================== -->
+<section class="category" id="cat-ui">
+<h2>User Interface</h2>
+
+<div class="card" id="create-widget">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Create Widget</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/cd6df316-fb57-489c-82c8-ea4031aac8f4" alt="create_widget" loading="lazy"></div>
+    <p class="note">Make sure "UMG" is included as a dependency in the Build.cs file.</p>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">TSubclassOf</span>&lt;<span class="ty">UUserWidget</span>&gt; ExampleWidgetClass;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Blueprint/UserWidget.h"</span>
+
+<span class="kw">if</span> (ExampleWidgetClass)
+{
+    <span class="ty">UUserWidget</span>* ExampleWidget = <span class="fn">CreateWidget</span>&lt;<span class="ty">UUserWidget</span>&gt;(<span class="fn">GetWorld</span>(), ExampleWidgetClass);
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="add-to-viewport">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Add to Viewport</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/5ce9b6d4-4a85-4209-8108-0fd73cf3cefd" alt="add_to_viewport" loading="lazy"></div>
+    <p class="note">Make sure "UMG" is included as a dependency in the Build.cs file.</p>
+<pre><code><span class="pp">#include "Blueprint/UserWidget.h"</span>
+
+<span class="ty">UUserWidget</span>* ExampleWidget;
+
+ExampleWidget-&gt;<span class="fn">AddToViewport</span>();</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-input-mode-game-only">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Input Mode Game Only</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/b722ab7c-7cc5-440b-a9c9-277318c73fc5" alt="set_input_mode_game_only" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);
+
+<span class="kw">if</span> (PlayerController)
+{
+    <span class="ty">FInputModeGameOnly</span> InputMode;
+    PlayerController-&gt;<span class="fn">SetInputMode</span>(InputMode);
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-input-mode-ui-only">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Input Mode UI Only</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8d3540e0-21b0-4bb0-97e1-6b1ff912a6c2" alt="set_input_mode_ui_only" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);
+
+<span class="kw">if</span> (PlayerController)
+{
+    <span class="ty">FInputModeUIOnly</span> InputMode;
+    PlayerController-&gt;<span class="fn">SetInputMode</span>(InputMode);
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-input-mode-game-and-ui">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Input Mode Game and UI</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/33c6c6a3-7a66-4ef9-bf21-a4685b79c621" alt="set_input_mode_game_and_ui" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);
+
+<span class="kw">if</span> (PlayerController)
+{
+    <span class="ty">FInputModeGameAndUI</span> InputMode;
+    PlayerController-&gt;<span class="fn">SetInputMode</span>(InputMode);
+}</code></pre>
+  </div>
+</div>
+</section>
+
+<!-- ==================== UTILITIES ==================== -->
+<section class="category" id="cat-utilities">
+<h2>Utilities</h2>
+
+<div class="card" id="delay">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Delay</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/2ed38a93-99ec-4c4b-b0be-3b9dd52a1926" alt="delay" loading="lazy"></div>
+    <p class="note">There is no equivalent to the delay node in C++. Use timers instead: put your code into a function and start a timer with the desired delay. See: Set Timer by Function Name</p>
+  </div>
+</div>
+
+<div class="card" id="print-string">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Print String</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/23c01a82-1284-4c52-8cc1-ae4b919e4890" alt="print_string" loading="lazy"></div>
+    <p class="note">Commonly used shorthand (minor differences from blueprint node):</p>
+<pre><code><span class="kw">if</span> (GEngine)
+{
+    GEngine-&gt;<span class="fn">AddOnScreenDebugMessage</span>(
+        -<span class="nu">1</span>,                        <span class="cm">// Key</span>
+        <span class="nu">2.0f</span>,                      <span class="cm">// Duration</span>
+        <span class="ty">FColor</span>::Cyan,              <span class="cm">// Color</span>
+        <span class="st">"Hello"</span>                    <span class="cm">// Message</span>
+    );
+}</code></pre>
+    <p class="note">Exact blueprint node equivalent:</p>
+<pre><code><span class="pp">#include "Kismet/KismetSystemLibrary.h"</span>
+
+<span class="ty">UKismetSystemLibrary</span>::<span class="fn">PrintString</span>(
+    <span class="kw">this</span>,                                    <span class="cm">// World context object</span>
+    <span class="st">"Hello"</span>,                                 <span class="cm">// Message</span>
+    <span class="kw">true</span>,                                    <span class="cm">// Print to screen?</span>
+    <span class="kw">true</span>,                                    <span class="cm">// Print to console?</span>
+    <span class="ty">FLinearColor</span>(<span class="nu">0.0f</span>, <span class="nu">0.66f</span>, <span class="nu">1.0f</span>, <span class="nu">1.0f</span>),   <span class="cm">// Color</span>
+    <span class="nu">2.0f</span>                                     <span class="cm">// Duration</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-player-controller">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get Player Controller</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/18f58b8b-86f1-482e-addb-15fb304b6c01" alt="get_player_controller" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-player-camera-manager">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get Player Camera Manager</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/8e1d3d1a-1e1b-411e-9295-0c6cf55d34fd" alt="get_player_camera_manager" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerCameraManager</span>* PlayerCameraManager = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerCameraManager</span>(<span class="kw">this</span>, <span class="nu">0</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="spawn-emitter-at-location">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Spawn Emitter at Location</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/6ecbed9d-961b-4953-993c-d48df3bb99ef" alt="spawn_emitter_at_location" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">UParticleSystem</span>* ExampleEmitter;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">UParticleSystemComponent</span>* SpawnedEmitter;
+<span class="ty">FTransform</span> SpawnTransform;
+
+<span class="kw">if</span> (ExampleEmitter)
+{
+    SpawnedEmitter = <span class="ty">UGameplayStatics</span>::<span class="fn">SpawnEmitterAtLocation</span>(
+        <span class="fn">GetWorld</span>(),        <span class="cm">// World object</span>
+        ExampleEmitter,    <span class="cm">// Emitter</span>
+        SpawnTransform     <span class="cm">// Spawn transform</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="line-trace-by-channel">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Line Trace By Channel</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/e7eb2f56-034d-4108-b261-f5f25e08a9fc" alt="line_trace_by_channel" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> Start;
+<span class="ty">FVector</span> End;
+
+<span class="ty">FHitResult</span> HitResult;
+
+<span class="kw">bool</span> bHit = <span class="fn">GetWorld</span>()-&gt;<span class="fn">LineTraceSingleByChannel</span>(
+    HitResult,                                   <span class="cm">// Hit result</span>
+    Start,                                       <span class="cm">// Start of the trace</span>
+    End,                                         <span class="cm">// End of the trace</span>
+    <span class="ty">ECollisionChannel</span>::ECC_Visibility            <span class="cm">// Trace channel</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="multi-line-trace-by-channel">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Multi Line Trace By Channel</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/55d5275e-21c2-4833-b7bd-beec07fab781" alt="multi_line_trace_by_channel" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> Start;
+<span class="ty">FVector</span> End;
+
+<span class="ty">TArray</span>&lt;<span class="ty">FHitResult</span>&gt; HitResults;
+
+<span class="kw">bool</span> bHit = <span class="fn">GetWorld</span>()-&gt;<span class="fn">LineTraceMultiByChannel</span>(
+    HitResults,                                  <span class="cm">// Hit results</span>
+    Start,                                       <span class="cm">// Start of the trace</span>
+    End,                                         <span class="cm">// End of the trace</span>
+    <span class="ty">ECollisionChannel</span>::ECC_Visibility            <span class="cm">// Trace channel</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-actor-of-class">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get Actor Of Class</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/0d699f2c-8f28-41c5-beca-375b20d6d84e" alt="get_actor_of_class" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">TSubclassOf</span>&lt;<span class="ty">AActor</span>&gt; ActorClass;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">AActor</span>* Actor;
+
+<span class="kw">if</span> (ActorClass)
+{
+    Actor = <span class="ty">UGameplayStatics</span>::<span class="fn">GetActorOfClass</span>(
+        <span class="kw">this</span>,               <span class="cm">// World context object</span>
+        ActorClass          <span class="cm">// Actor class</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-all-actors-of-class">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get All Actors Of Class</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/7541737c-afa4-457b-ab9c-870d8c2a19f0" alt="get_all_actors_of_class" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">TSubclassOf</span>&lt;<span class="ty">AActor</span>&gt; ActorClass;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">TArray</span>&lt;<span class="ty">AActor</span>*&gt; Actors;
+
+<span class="kw">if</span> (ActorClass)
+{
+    <span class="ty">UGameplayStatics</span>::<span class="fn">GetAllActorsOfClass</span>(
+        <span class="kw">this</span>,               <span class="cm">// World context object</span>
+        ActorClass,         <span class="cm">// Actor class</span>
+        Actors              <span class="cm">// (Output) Result</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-all-actors-with-tag">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get All Actors with Tag</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/d1cc4737-9fff-4539-819a-d9c31f118631" alt="get_all_actors_with_tag" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">TArray</span>&lt;<span class="ty">AActor</span>*&gt; Actors;
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">GetAllActorsWithTag</span>(
+    <span class="kw">this</span>,                           <span class="cm">// World context object</span>
+    <span class="st">"ExampleTag"</span>,                   <span class="cm">// Tag name</span>
+    Actors                          <span class="cm">// (Output) Result</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="spawn-actor-from-class">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Spawn Actor from Class</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/6683dcff-7954-41ea-b6ae-c712fc7086ac" alt="spawn_actor_from_class" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">TSubclassOf</span>&lt;<span class="ty">AActor</span>&gt; ActorClass;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="ty">AActor</span>* SpawnedActor;
+<span class="ty">FVector</span> Location;
+<span class="ty">FRotator</span> Rotation;
+<span class="ty">FActorSpawnParameters</span> SpawnParameters;
+
+<span class="kw">if</span> (ActorClass)
+{
+    SpawnedActor = <span class="fn">GetWorld</span>()-&gt;<span class="fn">SpawnActor</span>&lt;<span class="ty">AActor</span>&gt;(
+        ActorClass,               <span class="cm">// Actor class</span>
+        Location,                 <span class="cm">// Spawn location</span>
+        Rotation,                 <span class="cm">// Spawn rotation</span>
+        SpawnParameters           <span class="cm">// Spawn parameters</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="play-sound-2d">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Play Sound 2D</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/71ad88a6-e375-4a67-bf55-9788352f282a" alt="play_sound_2d" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">USoundBase</span>* ExampleSound;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="kw">if</span> (ExampleSound)
+{
+    <span class="ty">UGameplayStatics</span>::<span class="fn">PlaySound2D</span>(
+        <span class="kw">this</span>,                   <span class="cm">// World context object</span>
+        ExampleSound,           <span class="cm">// Sound</span>
+        <span class="nu">1.0f</span>,                   <span class="cm">// Volume multiplier</span>
+        <span class="nu">1.0f</span>                    <span class="cm">// Pitch multiplier</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="play-sound-at-location">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Play Sound at Location</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/6c02a8fa-e6aa-4095-9ed7-bf190787334d" alt="play_sound_at_location" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">USoundBase</span>* ExampleSound;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">FVector</span> Location;
+
+<span class="kw">if</span> (ExampleSound)
+{
+    <span class="ty">UGameplayStatics</span>::<span class="fn">PlaySoundAtLocation</span>(
+        <span class="kw">this</span>,                           <span class="cm">// World context object</span>
+        ExampleSound,                   <span class="cm">// Sound</span>
+        Location,                       <span class="cm">// Location</span>
+        <span class="nu">1.0f</span>,                           <span class="cm">// Volume multiplier</span>
+        <span class="nu">1.0f</span>                            <span class="cm">// Pitch multiplier</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="apply-damage">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Apply Damage</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/145bd299-a6b3-4f3f-a6b0-1595f3bfef5c" alt="apply_damage" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">AController</span>* EventInstigator;
+<span class="ty">AActor</span>* DamagedActor;
+<span class="ty">AActor</span>* DamageCauser;
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">ApplyDamage</span>(
+    DamagedActor,                  <span class="cm">// Damaged actor</span>
+    <span class="nu">100.0f</span>,                        <span class="cm">// Damage amount</span>
+    EventInstigator,               <span class="cm">// Instigator</span>
+    DamageCauser,                  <span class="cm">// Damage causer</span>
+    <span class="ty">UDamageType</span>::<span class="fn">StaticClass</span>()     <span class="cm">// Damage type</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="apply-radial-damage">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Apply Radial Damage</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/301f1027-7c78-48ed-9184-99f1f98912f5" alt="apply_radial_damage" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">FVector</span> Origin;
+<span class="ty">AActor</span>* DamageCauser;
+<span class="ty">AController</span>* EventInstigator;
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">ApplyRadialDamage</span>(
+    <span class="kw">this</span>,                          <span class="cm">// World context object</span>
+    <span class="nu">100.0f</span>,                        <span class="cm">// Damage amount</span>
+    Origin,                        <span class="cm">// Damage location</span>
+    <span class="nu">200.0f</span>,                        <span class="cm">// Damage radius</span>
+    <span class="ty">UDamageType</span>::<span class="fn">StaticClass</span>(),    <span class="cm">// Damage type</span>
+    <span class="ty">TArray</span>&lt;<span class="ty">AActor</span>*&gt;(),             <span class="cm">// Ignored actors</span>
+    DamageCauser,                  <span class="cm">// Damage causer</span>
+    EventInstigator,               <span class="cm">// Instigator</span>
+    <span class="kw">false</span>                          <span class="cm">// Do full damage?</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-game-mode">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get Game Mode</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/551eb2ec-e355-40f1-9806-cd8c4f5c125c" alt="get_game_mode" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">AGameModeBase</span>* GameMode = <span class="ty">UGameplayStatics</span>::<span class="fn">GetGameMode</span>(<span class="kw">this</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="get-game-state">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Get Game State</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/f5ca4328-10be-4dc7-8020-40bbe4d66b7d" alt="get_game_state" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">AGameStateBase</span>* GameState = <span class="ty">UGameplayStatics</span>::<span class="fn">GetGameState</span>(<span class="kw">this</span>);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="project-world-to-screen">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Project World to Screen</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/505ba30c-f055-43af-af9b-cd3baa6753b8" alt="project_world_to_screen" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);
+
+<span class="ty">FVector</span> WorldPosition;
+<span class="ty">FVector2D</span> ScreenPosition;
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">ProjectWorldToScreen</span>(
+    PlayerController,                  <span class="cm">// Target player</span>
+    WorldPosition,                     <span class="cm">// World position</span>
+    ScreenPosition,                    <span class="cm">// (Output) Screen position</span>
+    <span class="kw">false</span>                              <span class="cm">// Player viewport relative?</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="deproject-screen-to-world">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Deproject Screen to World</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/81d761bd-ca33-4885-aa1a-bb74ed88d65d" alt="deproject_screen_to_world" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);
+
+<span class="ty">FVector2D</span> ScreenPosition;
+
+<span class="ty">FVector</span> WorldPosition;
+<span class="ty">FVector</span> WorldDirection;
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">DeprojectScreenToWorld</span>(
+    PlayerController,                  <span class="cm">// Target player</span>
+    ScreenPosition,                    <span class="cm">// Screen position</span>
+    WorldPosition,                     <span class="cm">// (Output) World position</span>
+    WorldDirection                     <span class="cm">// (Output) World direction</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="open-level-by-name">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Open Level (by Name)</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/e8ff0289-3754-4a6b-b861-77dc69f343d7" alt="open_level_by_name" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">OpenLevel</span>(
+    <span class="kw">this</span>,                    <span class="cm">// World context object</span>
+    <span class="st">"ExampleMap"</span>             <span class="cm">// Level name</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="set-game-paused">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Set Game Paused</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/abb42c34-1413-46bc-891f-f3da7e545b37" alt="set_game_paused" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="kw">bool</span> bPaused;
+
+<span class="ty">UGameplayStatics</span>::<span class="fn">SetGamePaused</span>(<span class="kw">this</span>, bPaused);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="spawn-decal-at-location">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Spawn Decal at Location</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/da67d5a2-4401-42fd-a5f4-0bf8ffe6ae76" alt="spawn_decal_at_location" loading="lazy"></div>
+    <span class="file-label">.h File</span>
+<pre><code><span class="kw">private</span>:
+    <span class="mc">UPROPERTY</span>(EditAnywhere, meta = (AllowPrivateAccess = <span class="st">"true"</span>))
+    <span class="ty">UMaterialInterface</span>* ExampleMaterial;</code></pre>
+    <span class="file-label">.cpp File</span>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+
+<span class="ty">UDecalComponent</span>* SpawnedDecal;
+<span class="ty">FVector</span> Size;
+<span class="ty">FVector</span> Location;
+<span class="ty">FRotator</span> Rotation;
+
+<span class="kw">if</span> (ExampleMaterial)
+{
+    SpawnedDecal = <span class="ty">UGameplayStatics</span>::<span class="fn">SpawnDecalAtLocation</span>(
+        <span class="kw">this</span>,                 <span class="cm">// World context object</span>
+        ExampleMaterial,      <span class="cm">// Decal material</span>
+        Size,                 <span class="cm">// Decal size</span>
+        Location,             <span class="cm">// Decal location</span>
+        Rotation,             <span class="cm">// Decal rotation</span>
+        <span class="nu">0.0f</span>                  <span class="cm">// Life span (0 = infinite)</span>
+    );
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="draw-debug-line">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Draw Debug Line</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/ab590515-2e8d-41db-9d80-d91a60cbe587" alt="draw_debug_line" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> Start;
+<span class="ty">FVector</span> End;
+
+<span class="fn">DrawDebugLine</span>(
+    <span class="fn">GetWorld</span>(),        <span class="cm">// World object</span>
+    Start,             <span class="cm">// Start of the line</span>
+    End,               <span class="cm">// End of the line</span>
+    <span class="ty">FColor</span>::Red,       <span class="cm">// Line color</span>
+    <span class="kw">false</span>,             <span class="cm">// Persistent?</span>
+    <span class="nu">5.0f</span>,              <span class="cm">// Duration</span>
+    <span class="nu">0</span>,                 <span class="cm">// Depth priority</span>
+    <span class="nu">1.0f</span>               <span class="cm">// Line thickness</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="draw-debug-box">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Draw Debug Box</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/811d4bb0-9757-45a3-82f5-4ef4103e1d5b" alt="draw_debug_box" loading="lazy"></div>
+<pre><code><span class="ty">FVector</span> Center;
+<span class="ty">FVector</span> Extent;
+
+<span class="fn">DrawDebugBox</span>(
+    <span class="fn">GetWorld</span>(),        <span class="cm">// World object</span>
+    Center,            <span class="cm">// Box center</span>
+    Extent,            <span class="cm">// Box extent</span>
+    <span class="ty">FColor</span>::Red,       <span class="cm">// Box color</span>
+    <span class="kw">false</span>,             <span class="cm">// Persistent?</span>
+    <span class="nu">5.0f</span>,              <span class="cm">// Duration</span>
+    <span class="nu">0</span>,                 <span class="cm">// Depth priority</span>
+    <span class="nu">1.0f</span>               <span class="cm">// Line thickness</span>
+);</code></pre>
+  </div>
+</div>
+
+<div class="card" id="is-valid">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Is Valid</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/d057e400-dbcd-4120-b909-0915e16d0215" alt="is_valid" loading="lazy"></div>
+    <p class="note">Common shorthand (not identical to blueprint node):</p>
+<pre><code><span class="ty">AActor</span>* ExampleActor;
+
+<span class="kw">if</span> (ExampleActor)
+{
+    <span class="cm">// Is Valid...</span>
+}
+<span class="kw">else</span>
+{
+    <span class="cm">// Is Not Valid...</span>
+}</code></pre>
+    <p class="note">Identical to the blueprint node:</p>
+<pre><code><span class="pp">#include "Kismet/KismetSystemLibrary.h"</span>
+
+<span class="ty">AActor</span>* ExampleActor;
+
+<span class="kw">if</span> (<span class="ty">UKismetSystemLibrary</span>::<span class="fn">IsValid</span>(ExampleActor))
+{
+    <span class="cm">// Is Valid...</span>
+}
+<span class="kw">else</span>
+{
+    <span class="cm">// Is Not Valid...</span>
+}</code></pre>
+  </div>
+</div>
+
+<div class="card" id="quit-game">
+  <div class="card-header" onclick="toggleCard(this)">
+    <h3>Quit Game</h3>
+    <span class="toggle">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <button class="img-toggle" onclick="toggleImg(this)">Show Blueprint</button>
+    <div class="img-container"><img class="blueprint-img" src="https://github.com/marcohenning/ue5-cheatsheet/assets/91918460/f980f272-75eb-46d6-958b-f2b0014a4afb" alt="quit_game" loading="lazy"></div>
+<pre><code><span class="pp">#include "Kismet/GameplayStatics.h"</span>
+<span class="pp">#include "Kismet/KismetSystemLibrary.h"</span>
+
+<span class="ty">APlayerController</span>* PlayerController = <span class="ty">UGameplayStatics</span>::<span class="fn">GetPlayerController</span>(<span class="kw">this</span>, <span class="nu">0</span>);
+
+<span class="ty">UKismetSystemLibrary</span>::<span class="fn">QuitGame</span>(
+    <span class="kw">this</span>,                        <span class="cm">// World context object</span>
+    PlayerController,            <span class="cm">// Quitting player controller</span>
+    <span class="ty">EQuitPreference</span>::Quit,       <span class="cm">// Quit preference</span>
+    <span class="kw">false</span>                        <span class="cm">// Ignore platform restrictions?</span>
+);</code></pre>
+  </div>
+</div>
+</section>
+
+</main>
+</div>
+
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})">&#8593;</button>
+
+<footer>
+  Based on <a href="https://github.com/marcohenning/ue5-cheatsheet">ue5-cheatsheet</a> by Marco Henning &mdash; MIT License
+</footer>
+
+<script>
+function toggleCard(header) {
+  header.parentElement.classList.toggle('collapsed');
+}
+
+function toggleImg(btn) {
+  const container = btn.nextElementSibling;
+  const visible = container.classList.toggle('visible');
+  btn.textContent = visible ? 'Hide Blueprint' : 'Show Blueprint';
+}
+
+// Search
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', function() {
+  const query = this.value.toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    const title = card.querySelector('h3').textContent.toLowerCase();
+    card.style.display = title.includes(query) ? '' : 'none';
+  });
+  document.querySelectorAll('nav a').forEach(link => {
+    const text = link.textContent.toLowerCase();
+    link.style.display = text.includes(query) ? '' : 'none';
+  });
+});
+
+// Back to top button
+window.addEventListener('scroll', () => {
+  document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 400);
+});
+
+// Keyboard shortcut: Ctrl+K to focus search
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchInput.focus();
+    searchInput.select();
+  }
+});
+</script>
+
+</body>
+</html>
