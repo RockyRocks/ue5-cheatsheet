@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math in Blueprints — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Math in Blueprints</h1>
+  <p>Build math the way the graph wants it: small pure functions, expressions, and libraries.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html" class="active">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Where math should live</h2>
+<div class="card"><h3>Three options</h3><div class="body">
+<ol>
+<li><strong>Math Expression</strong> node. Type <code>sin(deg*pi/180)*radius</code> in one node. Best for a formula you would otherwise spell with ten nodes.</li>
+<li><strong>Pure function</strong> on the Blueprint or in a Blueprint Function Library. Best when the same formula is used in several graphs and you want input pins with names.</li>
+<li><strong>C++ <code>BlueprintPure</code> function</strong> in a <code>UBlueprintFunctionLibrary</code>. Best when the math is hot, tested, or already exists in <code>FMath</code>.</li>
+</ol>
+<p>UE5 world coordinates are large. Transform locations use double precision. Blueprint float pins are still single precision unless you are on a double pin (vector components pulled from a transform are handled by the engine nodes). Do not hand-roll a double type with two floats.</p>
+</div></div>
+<div class="card"><h3>Math Expression examples</h3><div class="body">
+<pre>clamp(alpha, 0, 1)
+lerp(a, b, alpha)
+saturate((value - min) / (max - min))
+dot(normalize(direction), forward)
+length(target - origin)
+atan2(y, x) * 180 / pi</pre>
+<p>Names in the expression become input pins. Keep the expression to one idea. If you need branches, use a function with Branch, not a giant expression.</p>
+</div></div>
+<h2>Recipes</h2>
+<div class="card"><h3>Map a range</h3><div class="body">
+<p>Use <strong>Map Range Clamped</strong> when a 0–1 input should become a speed, a volume, or a color channel. Unclamped map range will extrapolate past the ends. That is useful for extrapolation and wrong for a health bar.</p>
+</div></div>
+<div class="card"><h3>Direction and distance</h3><div class="body">
+<ol>
+<li><strong>Get Unit Direction (Vector)</strong> from A to B, or subtract and <strong>Normalize</strong>.</li>
+<li><strong>Distance (Vector)</strong> or <strong>Vector Length</strong> of the difference. Length squared is cheaper when you only compare against a radius squared.</li>
+<li><strong>Find Look at Rotation</strong> when an actor should face a point. Combine with <strong>RInterp To</strong> on tick if it should turn smoothly. Pass delta seconds. Do not hard-code 0.016.</li>
+<li><strong>Dot product</strong> of two normals tells you facing. 1 is the same direction, 0 is perpendicular, -1 is opposite.</li>
+<li><strong>Cross product</strong> gives a perpendicular vector. Use it to build an orthonormal basis, not as a general "rotation" node.</li>
+</ol>
+</div></div>
+<div class="card"><h3>Interpolation</h3><div class="body">
+<ul>
+<li><strong>Lerp</strong> is a blend by alpha. Alpha 0 returns A, alpha 1 returns B. It does not ease over time by itself.</li>
+<li><strong>FInterp To</strong>, <strong>VInterp To</strong>, and <strong>RInterp To</strong> move toward a target using delta time. They are the tick-friendly versions.</li>
+<li><strong>Ease</strong> nodes shape a 0–1 alpha before you lerp.</li>
+<li>Constant interp speed ignores frame rate. Multiplying a raw speed by delta time is the other correct pattern. Mixing them double-applies time.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Angles</h3><div class="body">
+<ul>
+<li>Blueprint rotator nodes speak degrees. <code>sin</code> and <code>cos</code> in expressions often speak radians. Convert at the boundary.</li>
+<li><strong>Delta (Rotator)</strong> and normalize-axis nodes keep you off 0/360 pops.</li>
+<li>Combine rotators only when you know the order. Prefer <strong>Compose Rotators</strong> or a transform multiply over adding pitch, yaw, and roll by hand.</li>
+</ul>
+</div></div>
+<div class="card"><h3>A library function</h3><div class="body">
+<p>Create a Blueprint Function Library, add a pure function <code>CritChance</code> with inputs <code>Base</code>, <code>Bonus</code>, <code>ClampMax</code>, and a float return. Body: Map Range or a Math Expression <code>clamp(base+bonus, 0, clampMax)</code>. Call it from any Blueprint. If profiling shows it on the hot path, move that one function to C++:</p>
+<pre>UFUNCTION(BlueprintPure, Category="Combat")
+static double CritChance(double Base, double Bonus, double ClampMax)
+{
+    return FMath::Clamp(Base + Bonus, 0.0, ClampMax);
+}</pre>
+<p>The matching nodes for Min, Max, Lerp, and Clamp are already on the C++ cheat sheet home page.</p>
+</div></div>
+<div class="card"><h3>Random</h3><div class="body">
+<p>Use Random Float in Range and Random Integer in Range. For loot that must repeat in a replay, use a Random Stream variable and seed it. Unseeded random nodes pull from the global stream and will not reproduce a bug.</p>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

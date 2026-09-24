@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World building — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>World building</h1>
+  <p>World Partition, PCG, and the 5.8 terrain and vegetation tools.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html" class="active">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Streaming worlds</h2>
+<div class="card"><h3>World Partition</h3><div class="body">
+<ul>
+<li>One persistent world, actors stored per cell (One File Per Actor). Designers stop locking a single umap for the whole country.</li>
+<li>Data Layers toggle sets of actors (story state, lighting scenario) without a second copy of the land.</li>
+<li>HLODs stand in for a cell that is loaded but far. Build them. An empty HLOD setup streams full detail too early.</li>
+<li>Level Instances and Packed Level Actors reuse a building or a room. They are the replacement for UE4 sublevel copy-paste.</li>
+<li>Always loaded is for the player start and the tiny persistent set. Everything else has a loading range.</li>
+</ul>
+</div></div>
+<div class="card"><h3>PCG and vegetation</h3><div class="body">
+<ul>
+<li>Procedural Content Generation graphs scatter points, filter by slope and layer, and spawn assemblies. 5.8 adds stronger nondestructive edits and graph workflow.</li>
+<li>The Procedural Vegetation Editor in 5.8 builds Nanite-ready plants with wind inside the editor.</li>
+<li>Runtime generation has a frame cost. Bake to instances or Nanite assemblies when the scatter does not need to change.</li>
+<li>Validators should check that PCG output meshes in the environment folder have Nanite and a sane cull distance.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Landscape and Mesh Terrain</h3><div class="body">
+<p>Heightfield Landscape remains the tool for rolling terrain. Mesh Terrain in 5.8 is experimental and exists so cliffs, caves, and overhangs are not fighting a heightfield. Do not convert a shipped landscape on a whim. Virtual heightfield and Nanite tessellation settings still apply to the classic landscape path in versions that enable them.</p>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

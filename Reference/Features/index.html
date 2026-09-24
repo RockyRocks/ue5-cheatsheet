@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unreal Engine 5.5 and later — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Unreal Engine 5.5 and later</h1>
+  <p>Nuances that matter when you move a project from 5.4 onto 5.5, 5.6, 5.7, or 5.8.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html" class="active">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>5.5</h2>
+<div class="card"><h3>What to learn</h3><div class="body">
+<ul>
+<li><strong>MegaLights</strong> arrived as the many-shadowed-lights path. In 5.5 it was new and easy to over-trust. Treat early captures as experiments; 5.8 marks it production-ready.</li>
+<li><strong>Nanite</strong> mesh settings grew: fallback meshes, displacement, edge-length limits for deforming meshes, and explicit tangents. The 5.7 Blueprint struct <em>Mesh Nanite Settings</em> exposes those fields.</li>
+<li><strong>Lumen on DirectX 11 / Shader Model 5</strong> regressed for some 5.5.x builds. Software Lumen on Windows is reliable on DX12 with Shader Model 6. Vulkan SM5 could still run it when DX11 could not.</li>
+<li><strong>Ray tracing</strong> has been a plugin since 5.4. Hardware Lumen and path tracing need that plugin, DX12, and a GPU that supports it. Do not expect the old project-settings checkbox layout.</li>
+<li><strong>Path tracer</strong> gained denoising work (including NFOR discussions in 5.5 comparisons). It is a ground-truth tool, not a gameplay GI solution.</li>
+<li>Mobile device profiles needed newer GPU entries. If a new Android phone falls through to a low bucket, check <code>DefaultDeviceProfiles.ini</code> before blaming the renderer.</li>
+</ul>
+</div></div>
+<h2>5.6</h2>
+<div class="card"><h3>What to learn</h3><div class="body">
+<ul>
+<li><strong>Unreal Insights GPU view</strong> lines up more closely with <code>ProfileGPU</code>. From 5.6, read Graphics and Compute as separate tracks. Most of Lumen's gather and reflections sit on the compute side.</li>
+<li><strong>Material editor</strong> updates live in the viewport as you scrub parameters, adds a Convert node, better node search, reroute creation, and custom texture channel names.</li>
+<li><strong>Modeling Mode</strong> tools (XForm, Pattern, Deform, PolyGroup, subdivision) are part of everyday blockout, not a side plugin you ignore.</li>
+</ul>
+</div></div>
+<h2>5.7</h2>
+<div class="card"><h3>What to learn</h3><div class="body">
+<ul>
+<li>Nanite settings are a first-class struct you can break in Blueprints: enabled, lerp UVs, shape preservation, fallback generation, max edge length, displacement UV channel, voxel opacity.</li>
+<li>Public mobile Lumen docs describe an experimental desktop renderer on high-end Android Vulkan SM5 devices. iOS, tvOS, and iPadOS do not run Lumen.</li>
+<li>Keep a non-Lumen lighting tier (static or stationary lightmaps, reflection captures) for the phones that miss the SM5 profile.</li>
+</ul>
+</div></div>
+<h2>5.8</h2>
+<div class="card"><h3>Production-ready in this release</h3><div class="body">
+<table>
+<tr><th>Feature</th><th>Practical meaning</th></tr>
+<tr><td>MegaLights</td><td>Many dynamic shadowed lights, aimed at 60 fps on current-gen consoles</td></tr>
+<tr><td>Lumen Lite</td><td>Faster GI than Lumen High Quality for handhelds and lower-end PCs</td></tr>
+<tr><td>Iris</td><td>Newer replication system you can adopt instead of only the classic net driver</td></tr>
+<tr><td>Dataflow</td><td>Node graphs for Chaos cloth and destruction authoring</td></tr>
+<tr><td>Movie Render Graph</td><td>Graph-based cinematic renders and layers</td></tr>
+<tr><td>Live Link Hub</td><td>One place for performance-capture devices and recording</td></tr>
+<tr><td>Audio Insights</td><td>Profile MetaSounds and audio in the Insights toolchain</td></tr>
+</table>
+<ul>
+<li><strong>Mesh Terrain</strong> is experimental mesh-based landscape (caves, overhangs), separate from heightfield Landscape.</li>
+<li><strong>Procedural Vegetation Editor</strong> builds Nanite-ready plants that can take wind.</li>
+<li><strong>Toon Shader</strong> and <strong>Fog Screen Space Scattering</strong> are look features, not free. Profile them like any other pass.</li>
+<li><strong>MetaHuman</strong> crowds, markerless single-camera capture, and broader Mesh to MetaHuman.</li>
+<li><strong>MCP plugin</strong> (experimental) lets an external model call engine tools. It is an editor integration, not a gameplay feature.</li>
+<li>Android cooks skip more unchanged work, SDK setup is more automated, and the Unreal Engine Remote app previews mobile input from the editor.</li>
+<li>Shader dedup and PSO precache are a shipping concern. Hitching on first-run materials is often a PSO miss, not a Blueprint bug.</li>
+</ul>
+<div class="callout">Epic has said 5.8 is the last planned major UE5 release, with room for a 5.9 if they need one. Pin your project to a hotfix (5.8.1 and later) and read that hotfix's upgrade notes before copying config from an older engine.</div>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>
