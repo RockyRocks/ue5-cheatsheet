@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unreal Engine 5 C++ Cheatsheet</title>
+<title>Unreal Engine 5+ Information</title>
 <style>
   :root {
     --bg: #0e1117;
@@ -265,6 +265,25 @@
   .search-box input:focus { border-color: var(--accent); }
   .search-box input::placeholder { color: var(--text-dim); }
 
+  .hub {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.65rem;
+    margin: 0 0 1.5rem;
+  }
+  .hub a {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 0.8rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .hub a:hover { border-color: var(--accent); }
+  .hub a strong { display: block; color: var(--accent); font-size: 0.875rem; }
+  .hub a span { display: block; color: var(--text-dim); font-size: 0.75rem; margin-top: 0.15rem; }
+
   .back-to-top {
     position: fixed;
     bottom: 2rem;
@@ -295,8 +314,8 @@
 <body>
 
 <header>
-  <h1>Unreal Engine 5 <span>C++ Cheatsheet</span></h1>
-  <p>Blueprint nodes translated to C++ &mdash; 85 examples across 8 categories</p>
+  <h1>Unreal Engine <span>5+ Information</span></h1>
+  <p>UE 5.5–5.8 reference for features, platforms, and profiling, plus Blueprint nodes translated to C++</p>
 </header>
 
 <div class="layout">
@@ -304,6 +323,21 @@
   <div class="search-box">
     <input type="text" id="search" placeholder="Search nodes..." autocomplete="off">
   </div>
+
+  <div class="nav-section">UE 5+</div>
+  <a href="Reference/index.html">Reference home</a>
+  <a href="Reference/Features/index.html">5.5+ features</a>
+  <a href="Reference/Nanite/index.html">Nanite</a>
+  <a href="Reference/Lumen/index.html">Lumen</a>
+  <a href="Reference/Insights/index.html">Unreal Insights</a>
+  <a href="Reference/Profiling/index.html">Profiling</a>
+  <a href="Reference/Blueprints/index.html">Blueprints</a>
+  <a href="Reference/BlueprintMath/index.html">Blueprint math</a>
+  <a href="Reference/Platforms/Windows/index.html">Windows</a>
+  <a href="Reference/Platforms/Android/index.html">Android</a>
+  <a href="Reference/Platforms/iOS/index.html">iOS</a>
+  <a href="Reference/Platforms/PlayStation/index.html">PlayStation</a>
+  <a href="Reference/Platforms/Xbox/index.html">Xbox</a>
 
   <div class="nav-section">Basics</div>
   <a href="#branch">Branch</a>
@@ -407,6 +441,37 @@
 </nav>
 
 <main>
+
+<section class="category" id="ue5-reference">
+<h2>Unreal Engine 5+ reference</h2>
+<p class="note" style="margin-bottom:1rem">Guides for 5.5 through 5.8. The node cards below are the original Blueprint-to-C++ cheat sheet.</p>
+<div class="hub">
+  <a href="Reference/index.html"><strong>All topics</strong><span>Folder index</span></a>
+  <a href="Reference/GettingStarted/index.html"><strong>Getting started</strong><span>Editor and first habits</span></a>
+  <a href="Reference/Features/index.html"><strong>5.5+ features</strong><span>What changed by version</span></a>
+  <a href="Reference/Nanite/index.html"><strong>Nanite</strong><span>Geometry and Insights</span></a>
+  <a href="Reference/Lumen/index.html"><strong>Lumen</strong><span>GI, Lite, mobile limits</span></a>
+  <a href="Reference/Rendering/index.html"><strong>Rendering</strong><span>VSM, MegaLights, TSR</span></a>
+  <a href="Reference/Insights/index.html"><strong>Unreal Insights</strong><span>Traces for GPU and CPU</span></a>
+  <a href="Reference/Profiling/index.html"><strong>Profiling</strong><span>stat, ProfileGPU, hitches</span></a>
+  <a href="Reference/Optimization/index.html"><strong>Optimization</strong><span>Budgets and order of work</span></a>
+  <a href="Reference/Blueprints/index.html"><strong>Blueprints</strong><span>Graphs, functions, debug</span></a>
+  <a href="Reference/BlueprintMath/index.html"><strong>Blueprint math</strong><span>Expressions and libraries</span></a>
+  <a href="Reference/Validation/index.html"><strong>Validation</strong><span>Checkers on Blueprints</span></a>
+  <a href="Reference/AssetPipeline/index.html"><strong>Asset pipeline</strong><span>Interchange, cook, textures</span></a>
+  <a href="Reference/Deployment/index.html"><strong>Deployment</strong><span>Cook and install</span></a>
+  <a href="Reference/Platforms/Windows/index.html"><strong>Windows</strong><span>DX12 and scalability</span></a>
+  <a href="Reference/Platforms/Android/index.html"><strong>Android</strong><span>Vulkan and device profiles</span></a>
+  <a href="Reference/Platforms/iOS/index.html"><strong>iOS</strong><span>Metal, no Lumen</span></a>
+  <a href="Reference/Platforms/PlayStation/index.html"><strong>PlayStation</strong><span>UE-side console settings</span></a>
+  <a href="Reference/Platforms/Xbox/index.html"><strong>Xbox</strong><span>UE-side console settings</span></a>
+  <a href="Reference/WorldBuilding/index.html"><strong>World building</strong><span>Partition, PCG, terrain</span></a>
+  <a href="Reference/Animation/index.html"><strong>Animation</strong><span>Rigs, montages, Sequencer</span></a>
+  <a href="Reference/Gameplay/index.html"><strong>Gameplay</strong><span>Input, GAS, State Tree</span></a>
+  <a href="Reference/Audio/index.html"><strong>Audio and Niagara</strong><span>MetaSounds and VFX</span></a>
+  <a href="Reference/Networking/index.html"><strong>Networking</strong><span>Replication and Iris</span></a>
+</div>
+</section>
 
 <!-- ==================== BASICS ==================== -->
 <section class="category" id="cat-basics">

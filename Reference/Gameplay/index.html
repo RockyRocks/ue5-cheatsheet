@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gameplay systems — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Gameplay systems</h1>
+  <p>The frameworks a new programmer should pick up before inventing their own.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html" class="active">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Input and ability</h2>
+<div class="card"><h3>Enhanced Input</h3><div class="body">
+<p>UE5's input system is Enhanced Input. An Input Action is a verb (Jump, Fire). An Input Mapping Context binds keys and gamepad events to actions and can be added per pawn or per mode.</p>
+<ul>
+<li>Triggers and modifiers (hold, tap, dead zone, sway) live on the mapping, not in a chain of Blueprint branches on Tick.</li>
+<li>Add and remove mapping contexts when you pause or enter a vehicle. Do not leave the UI context active under the game.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Gameplay Ability System</h3><div class="body">
+<p>GAS is a plugin. Abilities, attributes, gameplay effects, and tags cover combat rules you would otherwise rewrite in Blueprints. Use it when you have cooldowns, prediction, and stacking buffs. A single-player walking sim does not need it.</p>
+<p>Tags (<code>FGameplayTag</code>) are the shared language between abilities, animation choosers, and UI. Define them in the project tag table, not as raw strings.</p>
+</div></div>
+<h2>AI and flow</h2>
+<div class="card"><h3>Behavior trees, State Trees, EQS</h3><div class="body">
+<ul>
+<li>Behavior trees remain the classic AI graph. Tasks should be short. Latent tasks must end.</li>
+<li>State Trees are the newer state machine for AI and for gameplay objects. Prefer them for new work in 5.5+ if your team has learned them.</li>
+<li>EQS picks a location. It is not an AI brain. Cache queries; do not run a dense test every tick.</li>
+<li>Smart Objects advertise interactable spots to AI.</li>
+<li>Mass Entity is the crowd/ECS framework when Actors are too heavy. MetaHuman crowd content in 5.8 is aimed at that scale.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Other systems worth knowing</h3><div class="body">
+<ul>
+<li><strong>Game Features and plugins</strong> load a slice of content (a mode, a season) without cooking it into the base pawn.</li>
+<li><strong>Common UI</strong> for layered menus, gamepad focus, and activation stacks.</li>
+<li><strong>Data Registries</strong> and the Asset Manager for item databases.</li>
+<li><strong>Gameplay Targeting and cameras</strong> (gameplay camera system) when camera code has outgrown a spring arm.</li>
+<li><strong>Modeling Mode and Geometry Script</strong> for tools and runtime mesh edits. Geometry Script is Blueprint-accessible mesh math; keep heavy booleans off the game thread.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

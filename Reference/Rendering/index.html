@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rendering features — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Rendering features</h1>
+  <p>Virtual Shadow Maps, MegaLights, Substrate, TSR, and the toon and fog additions in 5.8.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html" class="active">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Shadows and lights</h2>
+<div class="card"><h3>Virtual Shadow Maps</h3><div class="body">
+<p>VSM is the shadow map system that pairs with Nanite. Pages cache and only redraw what moved. A fully dynamic world (every mesh using World Position Offset, every light moving) invalidates that cache and the cost returns.</p>
+<ul>
+<li><code>stat virtualshadowmaps</code> shows page pool and cache behavior.</li>
+<li>Non-Nanite geometry still casts, but the usual win assumes Nanite casters.</li>
+<li>On mobile forward renderers, classic cascaded shadow maps for one directional light are the supported path. Do not expect VSM there.</li>
+</ul>
+</div></div>
+<div class="card"><h3>MegaLights</h3><div class="body">
+<p>MegaLights makes large numbers of dynamic shadowed lights practical. It shipped experimental in 5.5 and is production-ready in 5.8, with a stated goal of 60 fps on current-generation consoles.</p>
+<ul>
+<li>Use it when the design is many local lights (street, interior practicals, spells), not to replace a single sun.</li>
+<li>5.5 captures showed mixed artifact results. Re-test on 5.8 before you lock art direction to it.</li>
+<li>Separate its GPU time from Lumen. Direct lighting and bounce lighting fail for different reasons.</li>
+</ul>
+</div></div>
+<h2>Materials and upscalers</h2>
+<div class="card"><h3>Substrate</h3><div class="body">
+<p>Substrate (the material shading model that replaced the older Strata experiment) authorizes layered slabs: clear coat, cloth fuzz, subsurface, eyes. Enable it only when the project needs that shading. It changes material permutations and shader compile times.</p>
+<p>5.6 material-editor quality-of-life (live preview, Convert node, better search) applies whether or not Substrate is on.</p>
+</div></div>
+<div class="card"><h3>TSR and anti-aliasing</h3><div class="body">
+<ul>
+<li>Temporal Super Resolution is the default upscaler. Resolution scale at 66% or so is a normal shipping choice on consoles and PC, not a debug hack.</li>
+<li>Plugins can add DLSS, FSR, or XeSS. Pick one upscaler per platform build.</li>
+<li>Mobile often uses FXAA or MSAA depending on HDR and the renderer. Temporal AA is expensive on low tiers.</li>
+<li>5.8 adds a Toon shader path and Fog Screen Space Scattering. Both are extra passes. Check them with <code>stat gpu</code> before you leave them on for mobile.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Path tracer</h3><div class="body">
+<p>The path tracer is for ground truth and Movie Render Graph cinematics, not for the game view. It needs hardware ray tracing. Compare Lumen against it when art says the bounce looks wrong, then fix content or Lumen settings rather than shipping the path tracer.</p>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

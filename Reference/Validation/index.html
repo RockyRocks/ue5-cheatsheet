@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset validation — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Asset validation</h1>
+  <p>Checkers that run against Blueprints and other assets before they reach a cook.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html" class="active">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>What a checker is</h2>
+<div class="card"><h3>Data Validation plugin</h3><div class="body">
+<p>Enable the Data Validation plugin. The editor then runs validators when you save, when you submit (if your source control is hooked up), and when you run the validation commandlet. This is the supported way to associate a checker with a Blueprint.</p>
+<ul>
+<li><code>UEditorValidatorBase</code> subclasses live in an editor module. Implement <code>CanValidateAsset</code> and <code>ValidateLoadedAsset</code>.</li>
+<li>Return <code>EDataValidationResult::Invalid</code> and add a message with an asset path so the Data Validation window can open the offender.</li>
+<li>Actors and components can override <code>IsDataValid</code>. A Blueprint child inherits that C++ check, so the checker follows every designer subclass.</li>
+<li>The Asset Audit window lists results across a folder. Use it in reviews, not only on submit.</li>
+</ul>
+</div></div>
+<div class="card"><h3>A Blueprint checker</h3><div class="body">
+<pre>bool UBlueprintNamingValidator::CanValidateAsset_Implementation(
+    const FAssetData&amp; AssetData, UObject* Asset, FDataValidationContext&amp; Context) const
+{
+    return Asset &amp;&amp; Asset-&gt;IsA&lt;UBlueprint&gt;();
+}
+
+EDataValidationResult UBlueprintNamingValidator::ValidateLoadedAsset_Implementation(
+    const FAssetData&amp; AssetData, UObject* Asset, FDataValidationContext&amp; Context)
+{
+    const UBlueprint* Blueprint = CastChecked&lt;UBlueprint&gt;(Asset);
+    const FString Name = Blueprint-&gt;GetName();
+    if (!Name.StartsWith(TEXT("BP_")))
+    {
+        AssetFails(Asset, FText::FromString(TEXT("Blueprint assets must use the BP_ prefix.")), Context);
+        return EDataValidationResult::Invalid;
+    }
+    AssetPasses(Asset);
+    return EDataValidationResult::Valid;
+}</pre>
+<p>More useful checks than prefixes:</p>
+<ul>
+<li>The generated class has a required component or interface.</li>
+<li>Soft paths are set, hard references to the giant master material are not.</li>
+<li>Tick is disabled on actors that were marked as decorative.</li>
+<li>Nanite is enabled on static meshes in <code>/Game/Environment</code> and disabled on translucent VFX meshes.</li>
+<li>A primary asset has a cook bundle and a valid Asset Manager label.</li>
+</ul>
+</div></div>
+<div class="card"><h3>IsDataValid on the actor</h3><div class="body">
+<pre>#if WITH_EDITOR
+EDataValidationResult APickup::IsDataValid(FDataValidationContext&amp; Context) const
+{
+    EDataValidationResult Result = Super::IsDataValid(Context);
+    if (Amount &lt;= 0)
+    {
+        Context.AddError(FText::FromString(TEXT("Pickup Amount must be positive.")));
+        Result = EDataValidationResult::Invalid;
+    }
+    return Result;
+}
+#endif</pre>
+<p>This runs for the C++ class and for Blueprint children. Put gameplay rules here. Put asset-wide policy (naming, folders, Nanite) in an editor validator so it can see meshes and materials that are not actors.</p>
+</div></div>
+<div class="card"><h3>Run it</h3><div class="body">
+<ul>
+<li>Editor: Tools or the Content Browser context menu for Validate Assets, depending on version. The Data Validation tab collects messages.</li>
+<li>Commandlet: cook and CI should call the data validation commandlet on the changelist so a bad Blueprint never reaches the build farm only.</li>
+<li>Validators are editor-only. They do not ship in the game module. Keep them out of runtime dependencies.</li>
+</ul>
+<div class="callout">A checker that loads every referenced world on save will make the editor unusable. Validate the asset you were given. Queue world checks for CI.</div>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

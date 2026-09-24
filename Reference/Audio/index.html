@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio and Niagara — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Audio and Niagara</h1>
+  <p>MetaSounds, Niagara, and the Insights view that landed as production-ready in 5.8.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html" class="active">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Audio</h2>
+<div class="card"><h3>MetaSounds</h3><div class="body">
+<p>MetaSounds is the UE5 audio graph. Sources are MetaSound assets, not only Sound Cues. You build generators, filters, and triggers in a graph that can take parameters from gameplay (RPM, wind, surface type).</p>
+<ul>
+<li>Concurrency and attenuation live on the sound so a hundred footfalls do not all play at full volume and full voice count.</li>
+<li>Quartz is the sample-accurate clock when music and gameplay must line up.</li>
+<li>Audio Insights is production-ready in 5.8. Capture it when you suspect a hitch is a wave decode or a voice spike rather than Nanite.</li>
+<li>Compression and streaming settings belong in the platform profile. A cinematic wav should not be the phone default.</li>
+</ul>
+</div></div>
+<h2>VFX</h2>
+<div class="card"><h3>Niagara</h3><div class="body">
+<ul>
+<li>Niagara systems and emitters replace Cascade. Use GPU sim for large counts and CPU sim when gameplay must read positions.</li>
+<li>Scalability on the emitter (spawn rate per quality) belongs in the effect, then follows <code>sg.EffectsQuality</code>.</li>
+<li>Overdraw kills mobile and also shows up in front of Lumen reflections. Shader Complexity and Quad Overdraw are the views.</li>
+<li>A Niagara system hard-referenced by a character loads with that character. Soft-reference rare ultimates.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Chaos cloth and destruction</h3><div class="body">
+<p>5.8 makes Dataflow production-ready for cloth and destruction authoring, and adds the Chaos Cloth Panel Editor. Simulate at the rate the camera can see. Authoring-time simulation does not have to be the runtime budget.</p>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>
