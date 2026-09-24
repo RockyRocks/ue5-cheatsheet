@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networking — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Networking</h1>
+  <p>Replication basics and Iris, which is production-ready in 5.8.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html" class="active">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Classic replication</h2>
+<div class="card"><h3>Rules that still hold</h3><div class="body">
+<ul>
+<li>The server owns gameplay. Clients predict movement and cosmetics when you deliberately set that up.</li>
+<li><code>bReplicates</code> on the actor, replicated properties, and RPCs (<code>Server</code>, <code>Client</code>, <code>NetMulticast</code>) are the Blueprint surface.</li>
+<li>Relevancy and dormancy decide who gets updates. A tight relevancy radius beats a smaller vector.</li>
+<li>Reliable RPCs that fire every shot will blow the reliable buffer. Batch, or use a replicated variable.</li>
+<li>Listen servers and dedicated servers both use the same replication. Package a server target when you need a headless process.</li>
+<li>Online subsystem (EOS or another) handles sessions and identity. It is not the replication system.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Iris</h3><div class="body">
+<p>Iris is the newer replication system. 5.8 marks it production-ready. It changes how properties are described and pushed so large actor counts cost less. Adoption is a project decision: read the Iris setup for your hotfix, enable it on a branch, and compare a network Insights capture against the classic driver before you flip the default.</p>
+<p>Design habits do not change. You still decide authority, prediction, and what is cosmetic.</p>
+</div></div>
+<div class="card"><h3>Profile</h3><div class="body">
+<ul>
+<li><code>stat net</code> for a coarse view.</li>
+<li>Network insights in a trace when you need per-actor cost.</li>
+<li>Test with packet lag and loss emulation, not only on localhost. Localhost hides ordering bugs.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

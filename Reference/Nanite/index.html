@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nanite — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Nanite</h1>
+  <p>Virtualized geometry: when to enable it, how it spends the frame, and how Insights shows that cost.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html" class="active">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>What it is</h2>
+<div class="card"><h3>Cluster LODs, not classic screen-size LODs</h3><div class="body">
+<p>Nanite stores a mesh as clusters and picks how much detail to draw per cluster from the pixels it covers. You author a high triangle mesh, enable Nanite on the static mesh, and the renderer keeps a budget of pixels per edge instead of swapping whole LOD meshes.</p>
+<ul>
+<li>Project switch: Project Settings → Engine → Rendering → Nanite. The mesh also has its own Nanite flag. Both must allow it.</li>
+<li>It wants Shader Model 6 and a desktop renderer (DirectX 12 on Windows, the high-end Vulkan path where you explicitly opt in).</li>
+<li>It does not replace materials, textures, or animation. A dense mesh with a unique heavy material per rock is still expensive.</li>
+<li>Fallback meshes exist so platforms and passes that cannot use Nanite still have something to draw. Set fallback triangle percent on purpose; the default is a guess.</li>
+</ul>
+</div></div>
+<div class="card"><h3>5.5+ mesh settings worth knowing</h3><div class="body">
+<ul>
+<li><strong>Max edge length factor</strong> stops clusters from simplifying so far that a mesh deformed by World Position Offset or a spline looks broken. Leave it at 0 unless you see that bug.</li>
+<li><strong>Lerp UVs</strong> should stay on for normal texture coordinates. Turn it off only when a UV channel stores indexes or other data that must not interpolate. If you disable it, Nanite no longer accounts for that UV error when it picks a LOD.</li>
+<li><strong>Explicit tangents</strong> cost memory. Use them when implicit tangents shade wrong (mirrors, hard authored seams).</li>
+<li><strong>Displacement</strong> samples a height map on a UV channel and can use voxel methods (opacity, NDF). Displacement is a content choice with a build cost, not a checkbox you enable on every mesh.</li>
+<li><strong>Preserve area / shape preservation</strong> matters for foliage and thin geo that disappears when simplified.</li>
+<li>Skeletal and skinned Nanite, assemblies, and spline meshes have matured across 5.4–5.8. Confirm the support level in your build before you convert a character pipeline.</li>
+</ul>
+</div></div>
+<h2>Authoring rules</h2>
+<div class="card"><h3>Enable it when the win is real</h3><div class="body">
+<ul>
+<li>Good fits: kitbash environments, rocks, dense modular sets, hero props with millions of triangles, Nanite vegetation from the Procedural Vegetation Editor (5.8).</li>
+<li>Poor fits: a 300-triangle crate, UI meshes, anything that is fully translucent, or a mesh whose material is masked across most of the screen. Masked Nanite overdraw shows up in the Nanite overdraw view.</li>
+<li>World Position Offset that moves vertices a lot fights the cluster LOD. Use the edge-length control, or keep that mesh on classic LODs.</li>
+<li>Instancing still matters. A thousand unique Nanite components cost more CPU scene setup than instanced copies.</li>
+</ul>
+</div></div>
+<h2>Read it in Insights and the viewport</h2>
+<div class="card"><h3>Views and stats</h3><div class="body">
+<ul>
+<li>Viewport: Lit → Nanite Visualization. Use <strong>Triangles</strong>, <strong>Clusters</strong>, <strong>Overdraw</strong>, <strong>Material ID</strong>, and <strong>Raster Bins</strong>.</li>
+<li>Material ID and raster bins tell you whether the cost is geometry or too many programmable raster materials. Lots of tiny triangles with few materials is the cheap case. Lots of materials is the expensive case.</li>
+<li>Console: <code>stat nanite</code> for instances, triangles, and clusters. <code>nanitestats</code> prints a deeper dump.</li>
+<li><code>ProfileGPU</code> and the Insights GPU track show Nanite vis-buffer and base-pass time. Compare a camera that sees the dense set with one that does not.</li>
+<li>Streaming: if Nanite pops or stalls, look at the streaming pool and IO, not only the raster pass. <code>stat streaming</code> still applies.</li>
+</ul>
+<pre>stat nanite
+r.Nanite.MaxPixelsPerEdge 1
+ProfileGPU</pre>
+<p class="note">Lower pixels-per-edge keeps more detail and costs more. Change it in a device profile per platform, not as a one-off in a packaged shipping build you forget about.</p>
+</div></div>
+<div class="card"><h3>Insights workflow for a Nanite scene</h3><div class="body">
+<ol>
+<li>Development build, <code>r.GPUStatsEnabled 1</code>.</li>
+<li><code>Trace.File default,gpu,frame,bookmark</code> or launch with <code>-trace=cpu,gpu,frame,bookmark</code>.</li>
+<li>Move the camera through the heavy area. Drop a bookmark (<code>Trace.Bookmark</code> or the Insights bookmark) at the worst frame.</li>
+<li>In Insights, open the GPU track and find Nanite raster and material bins. If Compute is idle and Graphics Nanite is tall, you are raster-bound. If bins explode, you are material-bound.</li>
+<li>Cross-check with the Nanite Overdraw view on that same camera.</li>
+</ol>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xbox — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Xbox</h1>
+  <p>Unreal-side setup you can keep in this repo. Partner-portal budgets stay in the Microsoft program.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../../Reference/index.html">Overview</a>
+<a href="../../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../../Reference/Platforms/Xbox/index.html" class="active">Xbox</a>
+<a href="../../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../../Reference/Animation/index.html">Animation</a>
+<a href="../../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../../Reference/Networking/index.html">Networking</a>
+<a href="../../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Access</h2>
+<div class="card"><h3>What this page will and will not claim</h3><div class="body">
+<p>Xbox development uses a platform extension and the Microsoft GDK, available through the Xbox program. Certification rules and many kit tools are under that agreement. This page covers the Unreal project layout that sits on top of an installed extension.</p>
+<div class="ok">After the extension is installed you get an Xbox platform target, platform config, packaging through the Xbox tools, and PIX on the dev kit for GPU captures.</div>
+</div></div>
+<h2>Project choices</h2>
+<div class="card"><h3>Series consoles</h3><div class="body">
+<ul>
+<li>Xbox Series X and Series S are the Nanite and Lumen generation. Series S has less GPU and memory. Give it its own device profile instead of hoping the Series X profile scales itself.</li>
+<li>DirectX 12 class features (Nanite, VSM, hardware ray tracing where you enable it, MegaLights in 5.8) match this tier.</li>
+<li>Set resolution scale per profile. A common split is a higher scale on Series X and a lower scale plus slightly lower GI quality on Series S.</li>
+<li>Last-generation Xbox One hardware does not share that feature set. If you still ship it, use a reduced renderer and baked lighting, in its own profile, and do not point it at Nanite-only meshes without fallbacks.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Config layout</h3><div class="body">
+<pre>; Illustrative. Match the profile names the GDK platform plugin creates.
+[XSX_Quality DeviceProfile]
++CVars=sg.ResolutionQuality=85
++CVars=sg.GlobalIlluminationQuality=3
++CVars=sg.ShadowQuality=3
+
+[XSS_Performance DeviceProfile]
++CVars=sg.ResolutionQuality=65
++CVars=sg.GlobalIlluminationQuality=2
++CVars=sg.ShadowQuality=2
++CVars=r.Streaming.PoolSize=1500</pre>
+<ul>
+<li>Keep pool sizes in the profile so Series S does not inherit a desktop 4 GB texture pool or a phone pool.</li>
+<li>Put achievements, commerce, and sign-in behind the platform's online subsystem, not inside gameplay Blueprints that also run on Windows.</li>
+<li>Cook Development for Insights and PIX. Run a Shipping cook before you judge memory, because editor data and debug packages lie.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Profile</h3><div class="body">
+<ul>
+<li>PIX for a GPU frame on the kit.</li>
+<li>Unreal Insights for a session that includes a fast travel and a combat encounter.</li>
+<li>Compare Series X and Series S traces side by side before you change a shared material.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

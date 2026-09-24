@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting started — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Getting started</h1>
+  <p>What a new programmer should know before touching Nanite settings or device profiles.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html" class="active">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Project shape</h2>
+<div class="card"><h3>Create the project for the platforms you will ship</h3><div class="body">
+<ul>
+<li>Pick a template that matches the game (first person, third person, blank). Blank is easier to reason about while learning.</li>
+<li>Target the highest platform first only if you will actually ship it. A mobile-first project should start with the Mobile renderer, not a desktop Lumen scene you later strip.</li>
+<li>Enable only the plugins you use. Extra plugins add cook time, shader permutations, and Blueprint nodes you do not need.</li>
+<li>Keep C++ and Blueprint in the same module layout from day one: gameplay in a game module, reusable math and validators in a separate editor or runtime module.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Blueprints and C++ together</h3><div class="body">
+<p>Blueprints are the default gameplay graph. C++ is for systems you tick often, data you want the compiler to check, and anything shared by many Blueprints.</p>
+<ul>
+<li>Expose design knobs with <code>UPROPERTY(EditAnywhere, BlueprintReadWrite)</code> and actions with <code>UFUNCTION(BlueprintCallable)</code>.</li>
+<li>Use <code>BlueprintImplementableEvent</code> when C++ should call a graph the designer fills in, and <code>BlueprintNativeEvent</code> when C++ has a default the graph can override.</li>
+<li>The home page of this site maps common Blueprint nodes to the C++ calls they wrap.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Frame of the editor</h3><div class="body">
+<ul>
+<li><strong>Content Browser</strong> is the asset database. Folders are not classes. Name assets by type prefix your team agrees on (<code>BP_</code>, <code>M_</code>, <code>T_</code>, <code>SM_</code>, <code>NS_</code>).</li>
+<li><strong>Outliner</strong> is the actors in the open level. World Partition levels stream cells instead of one giant actor list.</li>
+<li><strong>Details</strong> is per-selection properties. Class defaults live on the Blueprint editor, not on a placed instance, unless you override them.</li>
+<li><strong>Output Log</strong> is where <code>Print String</code> and <code>UE_LOG</code> land. Read it before assuming a node did not fire.</li>
+</ul>
+</div></div>
+<h2>First habits</h2>
+<div class="card"><h3>References</h3><div class="body">
+<ul>
+<li>A hard reference (object pin, defaulted asset) loads that asset whenever the referencer loads.</li>
+<li>A soft reference (<code>TSoftObjectPtr</code>, Soft Object Path) records the path and loads on demand. Use it for UI, levels, and large meshes a menu should not pull in.</li>
+<li>Casting to a Blueprint class hard-references that class. Cast to a C++ parent or a Blueprint interface when many types share a behavior.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Construction Script, BeginPlay, Tick</h3><div class="body">
+<ul>
+<li><strong>Construction Script</strong> runs in the editor when you move the actor or change a property. Keep it deterministic and cheap. Do not spawn gameplay that should exist only at runtime.</li>
+<li><strong>BeginPlay</strong> runs when the actor starts playing. Cache components here.</li>
+<li><strong>Tick</strong> runs every frame. New programmers put too much here. Prefer timers, overlap events, and Enhanced Input.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Where settings live</h3><div class="body">
+<table>
+<tr><th>Place</th><th>Use it for</th></tr>
+<tr><td>Project Settings</td><td>Engine features: Nanite, Lumen, mobile HDR, maps to cook, platform SDK</td></tr>
+<tr><td>Config/DefaultEngine.ini and platform Engine.ini</td><td>Checked-in cvars and system settings</td></tr>
+<tr><td>Config/DefaultDeviceProfiles.ini</td><td>Per-device or per-bucket console variables</td></tr>
+<tr><td>Config/DefaultScalability.ini</td><td>Low / medium / high / epic / cinematic groups</td></tr>
+<tr><td>Post Process Volume</td><td>Per-level look: exposure, GI method, reflection method</td></tr>
+<tr><td>Developer console (`)</td><td>Experiments. Promote the ones you keep into config.</td></tr>
+</table>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

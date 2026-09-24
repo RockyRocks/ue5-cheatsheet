@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profiling — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Profiling</h1>
+  <p>A repeatable order of checks before you change a cvar.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html" class="active">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>In the running game</h2>
+<div class="card"><h3>First three commands</h3><div class="body">
+<pre>stat unit
+stat unitgraph
+stat gpu</pre>
+<p><code>stat unit</code> splits Frame, Game, Draw, GPU, and RHIT. The largest number is the bound you work on. If Game is 20 ms and GPU is 8 ms, Nanite and Lumen are not the problem.</p>
+<table>
+<tr><th>Command</th><th>Question it answers</th></tr>
+<tr><td><code>stat fps</code></td><td>Is the frame time even the bug you think it is?</td></tr>
+<tr><td><code>stat game</code></td><td>Which tick group owns the game thread?</td></tr>
+<tr><td><code>stat scenerendering</code></td><td>Draw calls and primitive counts</td></tr>
+<tr><td><code>stat nanite</code></td><td>Clusters, triangles, instances</td></tr>
+<tr><td><code>stat lumen</code></td><td>Lumen update and probe counters</td></tr>
+<tr><td><code>stat virtualshadowmaps</code></td><td>VSM cache and page pool</td></tr>
+<tr><td><code>stat streaming</code></td><td>Texture and geometry pools</td></tr>
+<tr><td><code>stat memory</code></td><td>Coarse memory categories</td></tr>
+<tr><td><code>stat hitches</code></td><td>Frames over the hitch threshold</td></tr>
+<tr><td><code>ProfileGPU</code></td><td>One-frame hierarchical GPU dump</td></tr>
+</table>
+</div></div>
+<div class="card"><h3>Viewport view modes</h3><div class="body">
+<ul>
+<li>Shader Complexity (Alt+8) for materials. On mobile preview this is the first art review.</li>
+<li>Quad Overdraw for transparency and masked stacks.</li>
+<li>Nanite Overdraw and Material ID.</li>
+<li>Light Complexity where MegaLights is off and you still have many forward lights.</li>
+<li>LOD Coloration when a mesh is not Nanite and the wrong LOD is stuck.</li>
+</ul>
+</div></div>
+<h2>Deeper captures</h2>
+<div class="card"><h3>When stat unit is not enough</h3><div class="body">
+<ul>
+<li><strong>Unreal Insights</strong> for multi-frame CPU and GPU. See the Insights page.</li>
+<li><strong>CSV profiler</strong> and <code>csvprofile</code> for automated runs you can diff in spreadsheets.</li>
+<li><strong>memreport -full</strong> writes a report under <code>Saved/Profiling/MemReports</code>.</li>
+<li><strong>obj list</strong> shows which UObject classes are resident. A leaked UI widget shows up here.</li>
+<li>Platform GPU captures (PIX on Windows and Xbox dev kits, RenderDoc where the RHI allows it, the vendor capture on Android/iOS) explain a single pass Insights only names.</li>
+</ul>
+<div class="ok">Profile Development builds on the target device. Editor frame time includes selection, thumbnails, and uncooked assets. A 60 fps editor number is not a shipping number.</div>
+</div></div>
+<div class="card"><h3>Hitch checklist</h3><div class="body">
+<ol>
+<li>PSO compilation on first sight of a material. Fix with precache, not with a smaller texture.</li>
+<li>Synchronous load of a hard-referenced asset. Move it to a soft reference or an async load.</li>
+<li>Garbage collection. Shorten the set of live UObjects; do not hide the hitch with a longer time limit only.</li>
+<li>Shader compile in editor. That one does not exist in a cooked game.</li>
+<li>Nanite or texture streaming catch-up after a camera teleport. Warm the stream or cut through a load screen.</li>
+</ol>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>
