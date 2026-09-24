@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animation — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Animation</h1>
+  <p>Graphs a gameplay programmer touches, and what 5.8 adds in the editor.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html" class="active">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Runtime</h2>
+<div class="card"><h3>Pieces</h3><div class="body">
+<ul>
+<li><strong>Skeleton, Skeletal Mesh, Animation Blueprint, Anim Sequence, Montage.</strong> The Anim Blueprint runs on the mesh component. Do not also drive the same bones from Tick unless you mean to.</li>
+<li><strong>State machines</strong> for locomotion. Blend spaces for speed and direction. Montages for attacks and hits, with slots so they override the upper body only.</li>
+<li><strong>Control Rig</strong> for procedural correction and for authoring. 5.8 adds a faster dynamics solver and direct mesh controls so animators touch the mesh instead of a cloud of nulls.</li>
+<li><strong>IK Rig and IK Retargeter</strong> move animation between skeletons. Retarget in the pipeline, not with a per-frame Blueprint solver, when the motion is authored.</li>
+<li><strong>Chooser and motion matching</strong> pick clips from data instead of a giant state machine. Use them when you have the animation set to feed them.</li>
+<li><strong>Linked anim layers</strong> keep a weapon graph separate from locomotion.</li>
+</ul>
+</div></div>
+<div class="card"><h3>What programmers should expose</h3><div class="body">
+<ul>
+<li>A small set of variables (speed, gait, aim yaw, is-in-air). The graph reads them. Gameplay sets them once per frame or from events, not from ten scattered Blueprints.</li>
+<li>Montage play from an ability or a replicated event, with a clear multicast policy.</li>
+<li>Animation budgets and update-rate optimization on crowds. MetaHuman crowds in 5.8 are a content system on top of instancing, not a reason to spawn a thousand full Actors.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Sequencer and capture</h3><div class="body">
+<ul>
+<li>Sequencer for cinematics and for gameplay sequences that are timelines rather than logic.</li>
+<li>Movie Render Graph is production-ready in 5.8 for offline renders.</li>
+<li>Live Link Hub is production-ready in 5.8 for device hub, sync, and recording.</li>
+<li>MetaHuman Animator can take markerless single-camera capture in 5.8. It is an authoring path. The runtime character is still a skeletal mesh with a rig.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

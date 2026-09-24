@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optimization — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Optimization</h1>
+  <p>Order of work for a new programmer: measure, then change one thing.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html" class="active">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Budgets</h2>
+<div class="card"><h3>Pick a frame time before you pick a feature</h3><div class="body">
+<table>
+<tr><th>Target</th><th>Frame time</th><th>Typical rendering path</th></tr>
+<tr><td>Cinematic / 30 fps hero</td><td>33 ms</td><td>Nanite, Lumen High, VSM, MegaLights, TSR</td></tr>
+<tr><td>60 fps current-gen and high PC</td><td>16.6 ms</td><td>Same features, lower resolution scale, Lumen and shadow scalability at High not Cinematic</td></tr>
+<tr><td>60 fps handheld / low PC (5.8)</td><td>16.6 ms</td><td>Lumen Lite or baked lighting, limited Nanite, aggressive resolution scale</td></tr>
+<tr><td>Mobile broad</td><td>33 ms or 16.6 ms</td><td>Mobile HDR tiers, no Lumen on iOS, static lights, ASTC, content scale factor</td></tr>
+</table>
+<p>Leave at least a few milliseconds for gameplay, audio, and the platform compositor. A GPU that fills the whole 16.6 ms will hitch the moment a particle overlaps the screen.</p>
+</div></div>
+<h2>CPU</h2>
+<div class="card"><h3>Blueprint and tick</h3><div class="body">
+<ul>
+<li>Turn tick off on actors that only react to overlaps, hits, or input.</li>
+<li>Do not <code>Get All Actors of Class</code> on tick. Cache the reference, use an interface, or register with a subsystem.</li>
+<li>Heavy Blueprint math on tick belongs in C++ or a timer. The node graph has a real call cost.</li>
+<li>Animation: update rate optimization and anim budgets before you rewrite the graph.</li>
+<li>Chaos: simplify collision. Complex as simple is a shipping foot-gun.</li>
+</ul>
+</div></div>
+<h2>GPU</h2>
+<div class="card"><h3>Change in this order</h3><div class="body">
+<ol>
+<li>Resolution scale and TSR, because it multiplies every later pass.</li>
+<li>Shadowed light count, VSM invalidation, then MegaLights if you are on 5.8 and the design needs the lights.</li>
+<li>Lumen scalability, then Lumen Lite on the platforms that need it.</li>
+<li>Nanite pixels per edge and masked/WPO materials.</li>
+<li>Overdraw: particles, translucent fog, decals.</li>
+<li>Texture streaming pool size per device profile so you do not blur or thrash.</li>
+</ol>
+</div></div>
+<div class="card"><h3>Content rules that beat cvars</h3><div class="body">
+<ul>
+<li>Unique materials on every mesh defeat instancing and Nanite bins.</li>
+<li>Max texture size in the texture LOD group per memory bucket (tiny phones do not need 4K world textures).</li>
+<li>HLOD and World Partition cell sizes so a streaming cell is not the whole country.</li>
+<li>One stationary directional light on mobile. Extra dynamic lights belong on the high Android profile only.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

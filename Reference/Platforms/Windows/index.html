@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Windows</h1>
+  <p>Desktop settings for Nanite, Lumen, and a scalable PC.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../../Reference/index.html">Overview</a>
+<a href="../../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../../Reference/Platforms/Windows/index.html" class="active">Windows</a>
+<a href="../../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../../Reference/Animation/index.html">Animation</a>
+<a href="../../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../../Reference/Networking/index.html">Networking</a>
+<a href="../../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Renderer</h2>
+<div class="card"><h3>Defaults that match the features</h3><div class="body">
+<ul>
+<li>DirectX 12 and Shader Model 6 for Nanite, virtual shadow maps, hardware ray tracing, and reliable Lumen.</li>
+<li>DirectX 11 is a compatibility target. Treat it as a reduced path: no Nanite, and do not depend on Lumen after the 5.5 SM5 issues.</li>
+<li>Vulkan on Windows is a useful comparison RHI, not the default shipping choice for most games.</li>
+</ul>
+<pre>[/Script/WindowsTargetPlatform.WindowsTargetSettings]
+DefaultGraphicsRHI=DefaultGraphicsRHI_DX12
+
+; DefaultEngine.ini, kept honest in source control
+r.Nanite=1
+r.DynamicGlobalIlluminationMethod=1
+r.ReflectionMethod=1</pre>
+<p class="note">Prefer the Project Settings UI so the ini keys match your hotfix. Copying stale keys from a 5.1 tutorial is a common way to silently disable a feature.</p>
+</div></div>
+<div class="card"><h3>Scalability</h3><div class="body">
+<p>Ship a scalability ladder instead of one cinematic setting.</p>
+<ul>
+<li>Epic / Cinematic: Nanite, Lumen High, VSM, MegaLights, TSR at a moderate screen percentage.</li>
+<li>High: the 60 fps target. Drop reflection quality and shadow quality before you disable GI.</li>
+<li>Medium / Low: Lumen Lite on 5.8, or screen-space GI plus baked sky, lower resolution scale, fewer shadow pages.</li>
+<li>Store overrides in <code>Config/DefaultScalability.ini</code> and let players change them with the scalability API or a settings Blueprint.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Profile</h3><div class="body">
+<ul>
+<li>Unreal Insights locally, <code>ProfileGPU</code>, and PIX for a single D3D12 frame.</li>
+<li>Test minimum-spec GPUs, not only the machine that builds lighting.</li>
+<li>Windowed mode and VSync hide frame time. Use <code>r.VSync 0</code> and an unlocked frame rate while measuring, then decide the shipping cap.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

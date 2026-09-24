@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deployment — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Deployment</h1>
+  <p>Cook, package, and get a Development build onto a device you can profile.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html" class="active">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Build types</h2>
+<div class="card"><h3>Which configuration</h3><div class="body">
+<table>
+<tr><th>Configuration</th><th>Use</th></tr>
+<tr><td>Debug</td><td>Breakpoints in engine code. Too slow to judge frame time.</td></tr>
+<tr><td>Development</td><td>Device profiling, Insights, stat commands, logs.</td></tr>
+<tr><td>Test</td><td>Closer to shipping, fewer debugging tools.</td></tr>
+<tr><td>Shipping</td><td>What players run. No stat overlay unless you left a backdoor.</td></tr>
+</table>
+<p>Profile Development on the metal you will ship, then confirm Shipping separately because logging and checks change the numbers.</p>
+</div></div>
+<div class="card"><h3>Cook and stage</h3><div class="body">
+<ol>
+<li>Set maps to cook, cultures, and the default map in Project Settings → Packaging.</li>
+<li>Platforms menu: choose the target, then Package Project, or use Project Launcher / Turnkey for repeatable profiles.</li>
+<li>Cook on the farm or locally. Iterative cooks are for day-to-day device hops. A clean cook is for release candidates.</li>
+<li>5.8 Android cooks skip more unchanged assets. Still do a clean cook before you declare a memory win.</li>
+<li>Install the staged build with the platform tool (Explorer, adb, Xcode/ios-deploy, or the console deployment tool from the partner SDK).</li>
+</ol>
+<pre>RunUAT.bat BuildCookRun -project=Your.uproject -platform=Win64 -clientconfig=Development -build -cook -stage -pak -archive</pre>
+<p class="note">Swap <code>-platform=Android</code> or <code>IOS</code> when the SDK is installed. Console platform names appear only after that platform's extension is installed.</p>
+</div></div>
+<div class="card"><h3>Launch a profiled session</h3><div class="body">
+<pre>-trace=cpu,gpu,frame,bookmark,counters -statnamedevents -tracehost=YOUR_PC_IP
+-ExecCmds="r.GPUStatsEnabled 1,stat unit"</pre>
+<p>On Android, <code>adb logcat</code> shows the log. On iOS, use the Mac console or the device log. On consoles, use the partner target manager plus Insights pointed at the kit.</p>
+<p>The Unreal Engine Remote app in 5.8 is for mobile input from the editor. It does not replace a packaged profile capture.</p>
+</div></div>
+<div class="card"><h3>Settings to lock before a platform build</h3><div class="body">
+<ul>
+<li>Scalability default and device profile cvars, not editor previews.</li>
+<li>Texture groups and pool sizes for that memory bucket.</li>
+<li>Lighting method the device can run (see each platform page).</li>
+<li>PSO precaching enabled so the first session is not a shader-compile demo.</li>
+<li>Logging verbosity down in Shipping.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

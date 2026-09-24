@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Android</h1>
+  <p>Device profiles, Vulkan, and where Lumen is allowed to exist.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../../Reference/index.html">Overview</a>
+<a href="../../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../../Reference/Platforms/Android/index.html" class="active">Android</a>
+<a href="../../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../../Reference/Animation/index.html">Animation</a>
+<a href="../../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../../Reference/Networking/index.html">Networking</a>
+<a href="../../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Renderer choice</h2>
+<div class="card"><h3>Mobile renderer first</h3><div class="body">
+<p>Most phones should use the mobile renderer and one of Epic's lighting tiers: LDR, basic static lighting, full HDR static, or HDR plus a single per-pixel directional light. That is the path that reaches mid and low devices.</p>
+<p>The desktop renderer (Vulkan, Shader Model 5) is an opt-in for high-end devices. Experimental Lumen on Android, documented for 5.4 and still the documented mobile path in 5.7, hangs off that renderer. iOS does not get the same path.</p>
+</div></div>
+<div class="card"><h3>Project settings to set on purpose</h3><div class="body">
+<ul>
+<li>Package name, minimum and target SDK, orientation, and graphics API list: Vulkan preferred, GLES only if you still need older devices.</li>
+<li><code>r.Android.DisableVulkanSupport=0</code> when you want Vulkan.</li>
+<li><code>r.Android.DisableVulkanSM5Support=0</code> only when you are opting high devices into the desktop renderer.</li>
+<li>Mobile HDR on for any lit tier. Off only for the LDR unlit tier.</li>
+<li>ASTC as the texture format. Keep ETC2 as fallback if your device list needs it.</li>
+<li>Forward shading or the mobile deferred path as your art direction requires. Deferred costs more and is not required for the static-light tiers.</li>
+<li>5.8: use the automated SDK setup, then still confirm licenses and NDK paths on the build machine.</li>
+</ul>
+</div></div>
+<h2>Device profiles</h2>
+<div class="card"><h3>DefaultDeviceProfiles.ini</h3><div class="body">
+<p>Window → Developer Tools → Device Profiles, and check the result into <code>Config/DefaultDeviceProfiles.ini</code>. Profiles inherit. Android's selector matches GPU families onto buckets such as Low, Mid, and High, plus Vulkan SM5 profiles when you extend them.</p>
+<pre>[Android_Low DeviceProfile]
+BaseProfileName=Android
++CVars=r.MobileContentScaleFactor=0.7
++CVars=r.MaterialQualityLevel=0
++CVars=sg.ShadowQuality=0
++CVars=sg.EffectsQuality=0
+
+[Android_High DeviceProfile]
+BaseProfileName=Android
++CVars=r.MobileContentScaleFactor=1.0
++CVars=sg.ShadowQuality=2
+
+[Android_High_Lumen DeviceProfile]
+BaseProfileName=Android_Vulkan_SM5
+; Only devices you have captured at frame time belong here.
++CVars=r.DynamicGlobalIlluminationMethod=1</pre>
+<p>Match rules belong in the profile selector so an unknown GPU falls down to Low, never up to Lumen.</p>
+<ul>
+<li>Memory buckets cap texture LOD group sizes. Set them in the Android engine config and reference the bucket from the profile.</li>
+<li>Preview in the editor with the Android previewer and Shader Complexity before you package.</li>
+<li>5.8 Platform Preview and the Remote app help input and look. Frame time still comes from a packaged Development build.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Profile on device</h3><div class="body">
+<pre>adb install -r YourGame.apk
+adb logcat -s UE
+adb shell am start -n com.your.game/com.epicgames.unreal.GameActivity --es trace cpu,gpu,frame</pre>
+<p>Pull <code>.utrace</code> files from the game's saved directory if you used <code>-tracefile</code>. GPU counters from the vendor (Adreno, Mali) explain fill-rate problems Insights only labels as the mobile base pass.</p>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

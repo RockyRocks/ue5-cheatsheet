@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset pipeline — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Asset pipeline</h1>
+  <p>From source file to cooked package, including Interchange, the Asset Manager, and platform textures.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html" class="active">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Import</h2>
+<div class="card"><h3>Interchange</h3><div class="body">
+<p>Interchange is the UE5 import framework for FBX, glTF, USD, and MaterialX. It replaces the older one-off FBX paths as the default in current engines. 5.8 fixes include MaterialX primvar baking cases; if a look breaks on reimport, check the Interchange stack before you hand-edit the material.</p>
+<ul>
+<li>Reimport preserves engine-side settings when the source path is intact. Breaking the source path and reimporting as a new asset loses Nanite flags, collision, and LOD settings.</li>
+<li>Nanite enable, distance field, and collision complexity are mesh properties. Set them in the static mesh editor or a validator, not in the DCC file name.</li>
+<li>USD and MaterialX matter for teams round-tripping with film tools. Game teams can stay on FBX or glTF if that is the whole pipe.</li>
+</ul>
+</div></div>
+<h2>Cook and chunks</h2>
+<div class="card"><h3>Asset Manager</h3><div class="body">
+<ul>
+<li>Primary Asset types (maps, items, abilities) are labels the Asset Manager scans.</li>
+<li>Cook rules decide what is always cooked, cooked in a chunk, or left out. An unreferenced Blueprint is not in the package unless a manager, a redirector, or an always-cook path names it.</li>
+<li>Chunks map to install packs. Put the first level in chunk 0 and optional biomes in later chunks.</li>
+<li>Soft references are how you point at an asset without cooking a hard edge from your player Blueprint into every skin.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Redirectors and folders</h3><div class="body">
+<p>Moving an asset leaves a redirector so old references resolve. Fix up redirectors before you cook a release. A chain of redirectors is a load-time tax and a source of "missing" assets that are only mis-pathed.</p>
+<p>Use folders as ownership boundaries (Characters, Environment, UI, Audio). Validators can then apply Nanite or texture rules per folder.</p>
+</div></div>
+<div class="card"><h3>Textures and meshes per platform</h3><div class="body">
+<table>
+<tr><th>Platform</th><th>Typical texture format</th></tr>
+<tr><td>Windows, Xbox, PlayStation</td><td>BC / DXT family (BC7 for color, BC5 for normals)</td></tr>
+<tr><td>Android and iOS</td><td>ASTC. ETC2 is the Android fallback where ASTC is missing</td></tr>
+</table>
+<ul>
+<li>Set maximum LOD size per texture group in the device profile memory buckets. A phone profile should not stream the cinematic 4K group.</li>
+<li>Virtual textures help unique large terrain. They are not a win for small UI icons.</li>
+<li>Nanite data cooks into the mesh. Platforms that cannot render it still need the fallback mesh in the cook.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Derived Data Cache</h3><div class="body">
+<p>Shaders and Nanite builds land in the Derived Data Cache. A shared DDC (including Zen storage in current engines) keeps the team from rebuilding the same mesh. If only one machine shows a Nanite artifact, compare DDC and engine hotfix before you blame the source art.</p>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

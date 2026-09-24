@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumen — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Lumen</h1>
+  <p>Dynamic global illumination and reflections, including Lumen Lite and the Android limits.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html" class="active">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>How the frame is split</h2>
+<div class="card"><h3>Three costs, not one toggle</h3><div class="body">
+<p>Lumen is dynamic GI and reflections. In a GPU trace the time usually lands in three places:</p>
+<ul>
+<li><strong>Lumen Scene Lighting</strong> updates the surface cache (cards) that rays hit.</li>
+<li><strong>Lumen Screen Probe Gather</strong> is the diffuse final gather. It often dominates.</li>
+<li><strong>Lumen Reflections</strong> traces what the screen can see, then falls back to the Lumen scene.</li>
+</ul>
+<p>Software traces use signed distance fields and the surface cache. Hardware traces use the ray tracing plugin and Shader Model 6. Hardware is not automatically faster; it is more accurate on thin and overlapping geometry. Measure both.</p>
+</div></div>
+<div class="card"><h3>Project and volume settings</h3><div class="body">
+<ul>
+<li>Project Settings → Rendering: Dynamic Global Illumination Method = Lumen, Reflection Method = Lumen. Generate mesh distance fields if you use software traces.</li>
+<li>Post Process Volume (infinite extent) can override GI and reflection method per level so a menu can be unlit while the game uses Lumen.</li>
+<li>Scalability groups <code>sg.GlobalIlluminationQuality</code> and <code>sg.ReflectionQuality</code> are the shipping knobs. Put them in <code>DefaultScalability.ini</code>, then override per device profile.</li>
+<li>Software Lumen on Windows: DirectX 12 and Shader Model 6. 5.5.x left DX11 / SM5 Lumen broken for many projects.</li>
+<li>Hardware Lumen: enable the ray tracing plugin, <code>r.RayTracing 1</code>, and a GPU that supports it. <code>r.Lumen.HardwareRayTracing 1</code> selects that path.</li>
+</ul>
+<pre>r.Lumen.DiffuseIndirect.Allow 1
+r.Lumen.Reflections.Allow 1
+r.Lumen.HardwareRayTracing 0
+stat lumen
+stat gpu</pre>
+</div></div>
+<h2>5.5 through 5.8</h2>
+<div class="card"><h3>Quality modes</h3><div class="body">
+<ul>
+<li><strong>Lumen High</strong> is the desktop and current-gen look. Profile screen probes first when you are over budget.</li>
+<li><strong>Lumen Lite</strong> (5.8) is the faster mode Epic describes as up to twice as fast as high quality, aimed at 60 fps on handhelds and lower-end PCs. Use it as a platform setting, not as a global downgrade of your hero PC target.</li>
+<li>Short-range AO and skylight leaks are content issues as often as they are cvars: large two-sided meshes, missing distance fields, and foliage cards confuse the surface cache.</li>
+<li>Emissive meshes light the Lumen scene. A huge emissive shader is a light. Budget it.</li>
+<li>MegaLights (production-ready in 5.8) handles many direct shadowed lights. Lumen still does the bounce. They stack. Profile them separately.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Mobile</h3><div class="body">
+<ul>
+<li>iOS, iPadOS, and tvOS: Lumen does not run. Use static or stationary lightmaps, reflection captures, and a single per-pixel directional light if you need the sun.</li>
+<li>Android: experimental Lumen needs the desktop renderer on Vulkan Shader Model 5 profiles such as <code>Android_Vulkan_SM5</code>, on high-end devices only. Turn off <code>r.Android.DisableVulkanSupport</code> and <code>r.Android.DisableVulkanSM5Support</code>, and review <code>r.RayTracing.RequireSM6</code> only if you are following Epic's mobile hardware-RT notes.</li>
+<li>Everyone else on Android stays on the mobile lighting tiers (LDR, basic static, full HDR, HDR plus one sun).</li>
+</ul>
+<div class="callout">Do not cook a Lumen-only lighting setup and discover on device that the phone picked <code>Android_Low</code>. Match profiles in Device Profiles before you light the level.</div>
+</div></div>
+<div class="card"><h3>Insights for Lumen</h3><div class="body">
+<ol>
+<li><code>Trace.Start gpu,rhi,frame,bookmark</code> on a Development build.</li>
+<li>Open the GPU / Compute track (5.6 and later). Find Screen Probe Gather, Reflections, and Scene Lighting.</li>
+<li><code>ProfileGPU</code> (Ctrl+Shift+,) for one frame when a single marker is ambiguous.</li>
+<li>If Scene Lighting is the spike, the surface cache is rebuilding (camera cuts, lots of new cards, WPO). If Gather is the spike, lower GI scalability or trace distance. If Reflections is the spike, cut roughness threshold and screen traces before you turn reflections off.</li>
+</ol>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

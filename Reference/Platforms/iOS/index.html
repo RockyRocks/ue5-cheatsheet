@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>iOS</h1>
+  <p>Metal, content scale, and a lighting setup that does not depend on Lumen.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../../Reference/index.html">Overview</a>
+<a href="../../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../../Reference/Blueprints/index.html">Blueprints</a>
+<a href="../../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../../Reference/Platforms/iOS/index.html" class="active">iOS</a>
+<a href="../../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../../Reference/Animation/index.html">Animation</a>
+<a href="../../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../../Reference/Networking/index.html">Networking</a>
+<a href="../../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>What the platform can run</h2>
+<div class="card"><h3>Constraints</h3><div class="body">
+<ul>
+<li>Metal only. There is no Vulkan and no DirectX fallback on device.</li>
+<li>Lumen is not supported on iOS, iPadOS, or tvOS in Epic's mobile Lumen documentation. Do not light a level only with Lumen and expect the iOS cook to invent lightmaps.</li>
+<li>Nanite is a desktop feature. Ship classic LODs or a Nanite fallback mesh that you have actually viewed in the mobile previewer.</li>
+<li>You need a Mac with Xcode to sign and deploy, even if the editor is on Windows (remote build).</li>
+</ul>
+</div></div>
+<div class="card"><h3>Settings</h3><div class="body">
+<ul>
+<li>Bundle id, signing team, minimum iOS version, and device orientations in the iOS project settings.</li>
+<li>Metal shader version and the mobile renderer aligned with your lighting tier.</li>
+<li>Mobile HDR on for lit games. One stationary directional light for the sun if you need per-pixel lighting. Everything else static.</li>
+<li>Reflection captures instead of Lumen reflections.</li>
+<li>ASTC textures. Smaller max LOD sizes on older phones via device profiles.</li>
+<li><code>r.MobileContentScaleFactor</code> per device in <code>DefaultDeviceProfiles.ini</code>. A full-resolution modern phone and an older phone should not share a scale.</li>
+<li>Disable features you cannot pay for: virtual shadow maps, hardware ray tracing, high translucency, and heavy post (bloom off on the low tier).</li>
+</ul>
+<pre>[iPhone_Low DeviceProfile]
+BaseProfileName=IOS
++CVars=r.MobileContentScaleFactor=0.75
++CVars=r.BloomQuality=0
++CVars=sg.PostProcessQuality=0
+
+[iPhone_High DeviceProfile]
+BaseProfileName=IOS
++CVars=r.MobileContentScaleFactor=1.0
++CVars=sg.ShadowQuality=2</pre>
+<p>iOS profile names follow the device. Extend <code>BaseDeviceProfiles</code> rather than replacing the whole family, and add new phones (the 5.5 notes called out missing devices such as iPhone 16e) when the selector does not know them.</p>
+</div></div>
+<div class="card"><h3>Deploy and profile</h3><div class="body">
+<ol>
+<li>Package for iOS from a machine that can see the Mac build service.</li>
+<li>Install a Development build through Xcode so you keep logs and Insights.</li>
+<li>Capture on device. The editor's mobile previewer is a shader and layout check, not a thermal check.</li>
+<li>Watch thermals over several minutes. A one-second <code>stat unit</code> will not show the GPU clock drop.</li>
+</ol>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>

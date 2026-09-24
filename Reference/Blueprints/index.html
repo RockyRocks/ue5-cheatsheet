@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueprints — Unreal Engine 5+</title>
+<link rel="stylesheet" href="../../assets/reference.css">
+</head>
+<body>
+<header>
+  <a class="home" href="../../index.html">&larr; Unreal Engine 5+ reference</a>
+  <h1>Blueprints</h1>
+  <p>How to work in the graph without painting yourself into a corner.</p>
+</header>
+<div class="layout">
+<nav>
+  <div class="nav-section">UE 5+</div>
+  <a href="../../Reference/index.html">Overview</a>
+<a href="../../Reference/GettingStarted/index.html">Getting started</a>
+<a href="../../Reference/Features/index.html">5.5+ features</a>
+<a href="../../Reference/Nanite/index.html">Nanite</a>
+<a href="../../Reference/Lumen/index.html">Lumen</a>
+<a href="../../Reference/Rendering/index.html">Rendering</a>
+<a href="../../Reference/Insights/index.html">Unreal Insights</a>
+<a href="../../Reference/Profiling/index.html">Profiling</a>
+<a href="../../Reference/Optimization/index.html">Optimization</a>
+<a href="../../Reference/Blueprints/index.html" class="active">Blueprints</a>
+<a href="../../Reference/BlueprintMath/index.html">Blueprint math</a>
+<a href="../../Reference/Validation/index.html">Asset validation</a>
+<a href="../../Reference/AssetPipeline/index.html">Asset pipeline</a>
+<a href="../../Reference/Deployment/index.html">Deployment</a>
+<a href="../../Reference/Platforms/Windows/index.html">Windows</a>
+<a href="../../Reference/Platforms/Android/index.html">Android</a>
+<a href="../../Reference/Platforms/iOS/index.html">iOS</a>
+<a href="../../Reference/Platforms/PlayStation/index.html">PlayStation</a>
+<a href="../../Reference/Platforms/Xbox/index.html">Xbox</a>
+<a href="../../Reference/WorldBuilding/index.html">World building</a>
+<a href="../../Reference/Animation/index.html">Animation</a>
+<a href="../../Reference/Gameplay/index.html">Gameplay</a>
+<a href="../../Reference/Audio/index.html">Audio & Niagara</a>
+<a href="../../Reference/Networking/index.html">Networking</a>
+<a href="../../index.html">C++ node list</a>
+</nav>
+<main>
+
+<h2>Graph types</h2>
+<div class="card"><h3>Event graph, functions, macros</h3><div class="body">
+<ul>
+<li><strong>Event graph</strong> holds events (BeginPlay, overlaps, input). It can store latent nodes such as Delay and timelines.</li>
+<li><strong>Functions</strong> are called and return. They cannot contain latent nodes. Mark a function <em>Pure</em> when it only computes and must not change state. Pure nodes run again every time they are wired, so an expensive pure function can execute more often than you think.</li>
+<li><strong>Macros</strong> paste their graph at each call. They can have exec pins and branches. They do not exist as a separate call at runtime, and they cannot be overridden in a child.</li>
+<li><strong>Collapsed graphs</strong> are organization. They do not change lifetime or replication.</li>
+<li><strong>Event dispatchers</strong> let an actor shout without knowing who listens. Prefer them over casting to a specific widget.</li>
+<li><strong>Interfaces</strong> (<code>BPI_</code>) let you call a function on any implementer without a hard class reference.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Execution</h3><div class="body">
+<ul>
+<li>White exec wires are order. Data wires are values. A node does not run because its data input changed; something must execute it, unless it is pure and connected to a node that is executing.</li>
+<li>Sequence is explicit order. Do not rely on the order of branches you did not wire.</li>
+<li>Local variables exist only during a function. Use them to avoid computing the same trace twice.</li>
+<li>Validate objects with Is Valid before you use a pin that might be empty. The home-page C++ sheet shows both the pointer check and <code>UKismetSystemLibrary::IsValid</code>.</li>
+</ul>
+</div></div>
+<h2>Working habits</h2>
+<div class="card"><h3>Debugging</h3><div class="body">
+<ul>
+<li>Place a breakpoint on a node. Play in the editor. The graph pauses and shows pin values.</li>
+<li>Enable <em>Show inherited variables</em> and watch the parent class. A child that does nothing often forgot to call the parent.</li>
+<li>Print String goes to the screen and the Output Log. Remove it before you profile; the widget has a cost.</li>
+<li>The compiler tab is the source of truth for errors. A Blueprint that compiles with warnings about unused pins is fine. A warning about a nativized or missing parent is not.</li>
+<li>Blueprint nativization from UE4 is gone. Shipping performance comes from moving hot paths to C++, not from a nativize checkbox.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Class design</h3><div class="body">
+<ul>
+<li>Put shared behavior in a C++ base or a Blueprint function library. Child Blueprints should mostly set data.</li>
+<li>Construction Script builds editor-time components and spline points. BeginPlay starts gameplay.</li>
+<li>Replicated Blueprints: mark variables replicated, use RepNotify when the client must react, and keep the authority path in one function. Iris (production-ready in 5.8) does not remove the need to decide what replicates.</li>
+<li>Components you add in the Blueprint editor are the ones designers expect to move. Adding them only in Construction Script surprises the next person.</li>
+</ul>
+</div></div>
+<div class="card"><h3>Data</h3><div class="body">
+<ul>
+<li>Expose tunables as variables with categories, tooltips, and clamps in the details metadata.</li>
+<li>Data Assets and Data Tables hold rows. Primary Data Assets participate in the Asset Manager.</li>
+<li>Enumerations and gameplay tags beat long string compares.</li>
+<li>Soft object references on a Blueprint variable do not load the asset until you resolve them.</li>
+</ul>
+</div></div>
+
+</main>
+</div>
+<footer>
+  Public-engine reference for day-to-day development. Console partner-portal numbers stay in the Sony and Microsoft programs.
+  Confirm cvars against the engine version you have open. <a href="../../index.html">Back to the cheat sheet</a>.
+</footer>
+</body>
+</html>
